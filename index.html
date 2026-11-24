@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RP-HUB — Единая игровая экосистема GTA 5 RP</title>
+<style>
+:root{--bg:#0d0f12;--card:#161920;--hov:#1e222b;--acc:#5865F2;--grn:#23a559;--red:#f23f42;--yel:#f0b232;--txt:#f3f4f6;--mut:#9ca3af;--brd:#262b36;--bgimg:none}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}
+body{background-color:var(--bg);background-image:var(--bgimg);background-size:cover;background-position:center;background-attachment:fixed;color:var(--txt);line-height:1.5;min-height:100vh;display:flex;flex-direction:column}
+header{background:rgba(22,25,32,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--brd);padding:11px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:10px}
+.logo{font-size:20px;font-weight:800;cursor:pointer;user-select:none;transition:.2s}.logo:hover{opacity:.8}.logo span{color:var(--acc)}
+.btn{padding:8px 14px;border-radius:8px;border:none;font-weight:600;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;color:#fff;transition:.15s}
+.btn:hover{filter:brightness(1.1)}
+.btn-p{background:var(--acc)}.btn-g{background:var(--grn)}.btn-r{background:rgba(242,63,66,.2);color:var(--red)}
+.btn-o{background:rgba(13,15,18,.6);border:1px solid var(--brd);color:var(--txt)}.btn-o:hover{background:var(--hov)}
+.btn-d{background:linear-gradient(135deg,#f59e0b,#ea580c)}
+.btn-sm{padding:5px 9px;font-size:12px}
+.layout{display:flex;flex:1;width:100%}
+.sidebar{width:235px;background:rgba(22,25,32,.95);backdrop-filter:blur(8px);border-right:1px solid var(--brd);padding:12px 10px;display:flex;flex-direction:column;gap:3px;flex-shrink:0}
+.tab{background:transparent;border:1px solid transparent;color:var(--mut);padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer;text-align:left;font-size:13px;display:flex;align-items:center;justify-content:space-between;transition:.15s}
+.tab:hover{background:var(--hov);color:var(--txt)}.tab.active{background:var(--acc);color:#fff}
+.badge-cnt{background:var(--red);color:#fff;font-size:11px;padding:1px 6px;border-radius:10px;font-weight:800}
+.main{flex:1;padding:22px 22px 64px 22px;min-width:0;display:flex;flex-direction:column;justify-content:space-between}
+.sec{display:none}.sec.active{display:block}
+.card{background:rgba(22,25,32,.94);backdrop-filter:blur(6px);border:1px solid var(--brd);border-radius:12px;padding:16px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+select,input,textarea{background:var(--bg);border:1px solid var(--brd);color:var(--txt);padding:9px 12px;border-radius:8px;font-size:13px;outline:none}
+select:focus,input:focus,textarea:focus{border-color:var(--acc)}
+.fg{margin-bottom:12px}.fg label{display:block;font-size:12px;color:var(--mut);margin-bottom:4px}.fg input,.fg select,.fg textarea{width:100%}
+.bdg{display:inline-block;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:700}
+.b-maj{background:rgba(235,59,90,.15);color:#eb3b5a}.b-gta{background:rgba(250,130,49,.15);color:#fa8231}.b-rad{background:rgba(45,152,218,.15);color:#2d98da}.b-oth{background:rgba(168,85,247,.15);color:#c084fc}
+.b-cat{background:rgba(88,101,242,.15);color:#8c9eff}.b-tz{background:rgba(255,255,255,.08);color:#d1d5db}.b-st{background:rgba(35,165,89,.15);color:var(--grn)}.b-ver{background:rgba(56,189,248,.18);color:#38bdf8}.b-ach{background:rgba(240,178,50,.18);color:var(--yel)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px}
+.sbox{background:var(--bg);border:1px solid var(--brd);padding:12px;border-radius:10px}
+.sbox h4{font-size:12px;color:var(--mut)}.sbox p{font-size:20px;font-weight:800;color:var(--grn)}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--brd);font-size:13px}th{color:var(--mut);font-size:11px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}.m-box{background:var(--card);border:1px solid var(--brd);border-radius:14px;width:100%;max-width:480px;padding:20px;max-height:90vh;overflow-y:auto}
+.role-chk{display:flex;align-items:center;gap:12px;background:var(--bg);border:1px solid var(--brd);padding:12px;border-radius:10px;margin-bottom:8px;cursor:pointer}.role-chk:hover{border-color:var(--acc)}
+.toast{position:fixed;bottom:64px;right:20px;background:var(--grn);color:#fff;padding:11px 16px;border-radius:8px;font-weight:600;font-size:13px;transform:translateY(140px);opacity:0;transition:.3s;z-index:300}.toast.show{transform:translateY(0);opacity:1}
+.top-alert{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--red);color:#fff;padding:12px 22px;border-radius:10px;font-weight:800;font-size:14px;z-index:400;box-shadow:0 8px 25px rgba(242,63,66,.45);transition:.35s;text-align:center}.top-alert.show{transform:translateX(-50%) translateY(0)}
+.hp-field{position:absolute;left:-9999px;opacity:0;pointer-events:none}
+body.stream-mode .hide-stream{filter:blur(6px);user-select:none;transition:.2s}
+.live-dot{display:inline-block;width:8px;height:8px;background:var(--red);border-radius:50%;margin-right:5px;animation:pulse 1.2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+footer{margin-top:40px;padding:14px;background:rgba(13,15,18,.85);border-radius:10px;border:1px solid var(--brd);font-size:11px;color:var(--mut);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+footer a{color:var(--mut);text-decoration:underline;cursor:pointer}footer a:hover{color:var(--txt)}
+@media(max-width:850px){.layout{flex-direction:column}.sidebar{width:100%;flex-direction:row;overflow-x:auto;border-right:none;border-bottom:1px solid var(--brd);padding:8px}.tab{white-space:nowrap;padding:8px 11px}.main{padding:14px 14px 70px 14px}}
+</style>
+</head>
+<body>
+<div class="top-alert" id="topAlert">⚠️ Запомните свой пин-код!</div>
+<header>
+  <div class="logo" onclick="location.reload()">🎮 RP<span>-HUB</span></div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <button class="btn btn-o btn-sm" id="smBtn" onclick="toggleStreamMode()">👁 Стример-мод</button>
+    <button class="btn btn-o btn-sm" onclick="op('mSettings')">⚙️ Настройки</button>
+    <button class="btn btn-o btn-sm" onclick="startGuide()">❓ Роли / Гид</button>
+        <a href="https://www.donationalerts.com/c/baron_qer" target="_blank" class="btn btn-d btn-sm">❤️ Поддержать</a>
+
+    <div id="authArea" style="display:flex;gap:6px;align-items:center"></div>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <button class="tab active" onclick="sw('lfg',this)"><span>🔍 Анкеты</span></button>
+    <button class="tab" onclick="sw('my',this)"><span>📋 Мои заявки</span><span class="badge-cnt" id="appBadge" style="display:none">0</span></button>
+    <button class="tab" onclick="sw('priv',this)"><span>👤 Личный кабинет</span></button>
+    <button class="tab" onclick="sw('crm',this)"><span>🛡 Кабинет Лидера</span></button>
+    <button class="tab" onclick="sw('med',this)"><span>🎥 Стримеры / Медиа</span></button>
+    <button class="tab" onclick="sw('top',this)"><span>🏆 Топ семей</span></button>
+    <button class="tab" onclick="sw('ptop',this)"><span>🏅 Топ игроков</span></button>
+    <button class="tab" onclick="sw('cal',this)"><span>📅 Сборы / Капты</span></button>
+    <button class="tab" onclick="sw('tim',this)"><span>⏱ Таймеры</span></button>
+    <button class="tab" onclick="sw('calc',this)"><span>🧮 Калькулятор и Рынок</span></button>
+    <button class="tab" onclick="sw('bl',this)"><span>🚫 ЧС Кидал</span></button>
+    <button class="tab" onclick="sw('rules',this)"><span>📜 Правила</span></button>
+    <button class="tab" onclick="sw('rp',this)"><span>📖 Шпаргалка РП</span></button>
+    <button class="tab" onclick="sw('promo',this)"><span>🎁 Промокоды</span></button>
+    <button class="tab" onclick="sw('rev',this)"><span>💬 Отзывы и Баги</span></button>
+    <button class="tab" id="admTab" style="display:none;color:var(--red)" onclick="sw('adm',this)"><span>🚨 Жалобы (Admin)</span><span class="badge-cnt" id="repBadge" style="display:none">0</span></button>
+  </aside>
+  <main class="main">
+    <div>
+    <div id="s-lfg" class="sec active">
+      <div class="card" style="border-color:rgba(88,101,242,.4);margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+          <div><b style="font-size:15px">⚡ Быстрый поиск напарника «Прямо сейчас»</b> <span style="font-size:11px;color:var(--mut)">(карточки сгорают через 2 часа)</span></div>
+          <button class="btn btn-p btn-sm" onclick="op('mFast')">+ Найти пати на 2ч</button>
+        </div>
+        <div id="fastBox" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+        <h2>Активные анкеты игроков и семей</h2>
+        <button class="btn btn-g" onclick="op('mPost')">+ Разместить анкету</button>
+      </div>
+      <input type="text" id="fSearch" placeholder="🔍 Быстрый поиск по тексту, нику или описанию..." oninput="rPosts()" style="width:100%;margin-bottom:10px">
+      <div class="filters">
+        <select id="fProj" onchange="updFilterServs();updFilterFrac();rPosts()"><option value="all">Все проекты</option><option value="Majestic RP">Majestic RP</option><option value="GTA 5 RP">GTA 5 RP</option><option value="Trace RP">Trace RP</option><option value="Arizona V">Arizona V</option><option value="Radmir / Мой Дом">Radmir / Мой Дом</option><option value="RMRP">RMRP</option></select>
+        <select id="fServ" onchange="rPosts()"><option value="all">Все серверы</option></select>
+        <select id="fCat" onchange="updFilterFrac();rPosts()"><option value="all">Все направления</option><option value="Набор в семью (ГОС / Крайм)">Набор в семью (ГОС / Крайм)</option><option value="Набор во фракцию (ГОС / Крайм)">Набор во фракцию (ГОС / Крайм)</option><option value="Ищу друга / команду">Ищу друга / команду</option></select>
+        <select id="fSubType" onchange="updFilterFrac();rPosts()" style="display:none"><option value="all">ГОС и Крайм</option><option value="Гос.">Только ГОС</option><option value="Крайм">Только Крайм</option></select>
+        <select id="fFrac" onchange="rPosts()" style="display:none"><option value="all">Все фракции</option></select>
+        <select id="fTz" onchange="rPosts()"><option value="all">Любой UTC</option><option value="UTC+1">UTC+1</option><option value="UTC+2">UTC+2</option><option value="UTC+3">UTC+3</option><option value="UTC+4">UTC+4</option><option value="UTC+5">UTC+5</option><option value="UTC+6">UTC+6</option><option value="UTC+7">UTC+7</option><option value="UTC+8">UTC+8</option><option value="UTC+9">UTC+9</option><option value="UTC+10">UTC+10</option></select>
+      </div>
+      <div class="grid" id="postsBox"></div>
+    </div>
+
+    <div id="s-my" class="sec">
+      <h2 style="margin-bottom:4px">Входящие заявки в мою семью / фракцию</h2>
+      <p style="font-size:12px;color:var(--mut);margin-bottom:14px">Кандидаты, откликнувшиеся на ваши анкеты.</p>
+      <div class="grid" id="inAppsBox" style="margin-bottom:26px"></div>
+      <h2 style="margin-bottom:12px">Мои опубликованные анкеты</h2>
+      <div class="grid" id="myPostsBox"></div>
+    </div>
+
+    <div id="s-priv" class="sec">
+      <div id="privSetup" class="card" style="max-width:440px;margin:30px auto;display:none">
+        <h3 style="margin-bottom:6px">🔐 Создание личного кабинета</h3>
+        <div class="fg"><label>Придумайте пин-код (от 4 цифр)</label><input type="password" id="newPrivPin" placeholder="Например: 2580"></div>
+        <div class="fg"><label>Секретное слово (для восстановления пин-кода)</label><input type="text" id="newPrivWord" placeholder="Кличка кота или любимое авто"></div>
+        <button class="btn btn-g" style="width:100%" onclick="createPrivCab()">Создать кабинет</button>
+      </div>
+      <div id="privLock" class="card" style="max-width:420px;margin:30px auto;text-align:center;display:none">
+        <div style="font-size:36px;margin-bottom:8px">🔒</div><h3 style="margin-bottom:6px">Личный кабинет игрока</h3>
+        <input type="password" id="privPinIn" placeholder="Пин-код" style="width:100%;margin-bottom:10px;text-align:center;font-size:16px;letter-spacing:3px">
+        <button class="btn btn-p" style="width:100%;margin-bottom:10px" onclick="unlockPriv()">Войти в кабинет</button>
+        <button class="btn btn-o btn-sm" style="width:100%" onclick="op('mRecPriv')">🔑 Забыли пин-код?</button>
+      </div>
+      <div id="privBody" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+          <div><h2>👤 Личный кабинет игрока</h2></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-o btn-sm" onclick="exportBackup('priv')">💾 Бэкап</button><button class="btn btn-o btn-sm" onclick="copyPassport()">✨ Поделиться паспортом</button><button class="btn btn-r btn-sm" onclick="lockPriv()">🔒 Закрыть</button></div>
+        </div>
+        <div class="grid">
+          <div class="card">
+            <h3 style="font-size:16px;margin-bottom:10px">🪪 Единый игровой паспорт</h3>
+            <div class="fg"><label>Игровой ник и статик (#ID)</label><input type="text" id="psName" placeholder="Dmitry Volkov #45120"></div>
+            <div class="fg"><label>Возраст (ООС)</label><input type="number" id="psAge" placeholder="19"></div>
+            <div class="fg"><label>Специализация</label><select id="psSpec"><option value="🎮 Новичок">🎮 Новичок</option><option value="⚔️ Стрелок / Капт-состав">⚔️ Стрелок / Капт-состав</option><option value="🏛 Гос. сотрудник">🏛 Гос. сотрудник</option><option value="💰 Фармила / Контракты">💰 Фармила / Контракты</option><option value="🚗 Перекуп / Бизнесмен">🚗 Перекуп / Бизнесмен</option><option value="🎥 Контент-мейкер / Стример">🎥 Контент-мейкер / Стример</option></select></div>
+            <div class="fg"><label>Ссылка на мувик (по желанию)</label><input type="url" id="psClip" placeholder="https://youtube.com..."></div>
+            <div class="fg"><label>YouTube канал</label><input type="url" id="psYt" placeholder="https://youtube.com@..."></div>
+            <div class="fg"><label>Twitch канал</label><input type="url" id="psTw" placeholder="https://twitch.tv..."></div>
+            <div class="fg"><label>Steam профиль</label><input type="url" id="psSt" placeholder="https://steamcommunity.com..."></div>
+            <div class="fg"><label>Опыт игры</label><textarea id="psBio" rows="2" placeholder="Кратко о вашем опыте..."></textarea></div>
+            <button class="btn btn-g" style="width:100%" onclick="savePassport()">💾 Сохранить паспорт</button>
+          </div>
+          <div>
+            <div class="card" id="passPreview" style="border-color:var(--acc)"></div>
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="font-size:16px">💰 Кошелёк и Трекер целей</h3><b id="pBal" class="hide-stream" style="font-size:18px;color:var(--grn)">$0</b></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"><input type="text" id="gNameIn" placeholder="Новая цель" style="flex:2;min-width:120px"><input type="number" id="gSumIn" placeholder="Цена ($)" style="flex:1;min-width:90px"><button class="btn btn-p btn-sm" onclick="addGoal()">+ Цель</button></div>
+              <div id="goalsListBox" style="margin-bottom:14px"></div>
+              <div style="border-top:1px solid var(--brd);padding-top:10px"><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"><select id="pType"><option value="in">+ Доход ($)</option><option value="out">- Расход ($)</option></select><input type="number" id="pSum" placeholder="Сумма" style="flex:1;min-width:80px"><input type="text" id="pNote" placeholder="За что" style="flex:2;min-width:100px"><button class="btn btn-g btn-sm" onclick="addPrivLog()">OK</button></div><div id="privLogs" class="hide-stream" style="max-height:110px;overflow-y:auto;font-size:12px"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s-crm" class="sec">
+      <div id="crmSetup" class="card" style="max-width:440px;margin:30px auto;display:none">
+        <h3 style="margin-bottom:6px">🛡 Создание кабинета Лидера Фамы</h3>
+        <div class="fg"><label>Название семьи</label><input type="text" id="newCrmFam" placeholder="Alpha Dynasty"></div>
+        <div class="fg"><label>Проект и сервер</label><input type="text" id="newCrmServ" placeholder="Majestic RP | Dallas"></div>
+        <div class="fg"><label>Пин-код (от 4 цифр)</label><input type="password" id="newCrmPin" placeholder="7744"></div>
+        <div class="fg"><label>Секретное слово</label><input type="text" id="newCrmWord" placeholder="Секретное слово"></div>
+        <button class="btn btn-g" style="width:100%" onclick="createCrmCab()">Создать кабинет</button>
+      </div>
+      <div id="crmLockScreen" class="card" style="max-width:420px;margin:30px auto;text-align:center;display:none">
+        <div style="font-size:36px;margin-bottom:8px">🔒</div><h3 id="crmLockTitle" style="margin-bottom:6px">Закрытый кабинет лидера</h3>
+        <input type="password" id="crmPinInput" placeholder="Пин-код семьи" style="width:100%;margin-bottom:10px;text-align:center;font-size:16px;letter-spacing:3px">
+        <button class="btn btn-p" style="width:100%;margin-bottom:10px" onclick="unlockCRM()">Разблокировать</button>
+        <button class="btn btn-o btn-sm" style="width:100%" onclick="op('mRecCrm')">🔑 Забыли пин-код?</button>
+      </div>
+      <div id="crmContent" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+          <div><h2 id="crmHeaderTitle">🛡 Кабинет Лидера</h2></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-o btn-sm" onclick="exportBackup('crm')">💾 Бэкап</button><button class="btn btn-o btn-sm" onclick="copyPayoutReport()">📋 Ведомость в DS</button><button class="btn btn-o btn-sm" onclick="op('mLeaderHelp')">❓ Инструкция</button><button class="btn btn-r btn-sm" onclick="lockCRM()">🔒 Закрыть</button><button class="btn btn-p btn-sm" onclick="op('mMem')">+ Боец</button></div>
+        </div>
+        <div class="stats"><div class="sbox"><h4>Общак</h4><p id="stBank" class="hide-stream" style="color:var(--yel)">$0</p></div><div class="sbox"><h4>Бойцов</h4><p id="stM" style="color:var(--txt)">0</p></div><div class="sbox"><h4>Контрактов</h4><p id="stC" style="color:var(--acc)">0</p></div><div class="sbox"><h4>К выплате</h4><p id="stP" class="hide-stream">$0</p></div></div>
+        <div class="card" style="border-color:var(--acc)"><h3 style="font-size:14px;margin-bottom:6px">🔗 Discord Webhook</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" id="whUrlIn" placeholder="https://discord.com..." style="flex:1"><button class="btn btn-p btn-sm" onclick="saveWebhook()">Сохранить</button><button class="btn btn-o btn-sm" onclick="testWebhook()">🔔 Тест</button></div></div>
+        <div class="card"><h3 style="font-size:14px;margin-bottom:8px">💰 Общак</h3><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><select id="bankType"><option value="in">+ Приход</option><option value="out">- Расход</option></select><input type="number" id="bankSum" placeholder="Сумма" style="flex:1"><input type="text" id="bankNote" placeholder="Комментарий" style="flex:2"><button class="btn btn-g btn-sm" onclick="addBankLog()">OK</button></div><div id="bankLogsBox" class="hide-stream" style="max-height:110px;overflow-y:auto;font-size:12px"></div></div>
+        <div class="card" style="overflow-x:auto"><table><thead><tr><th>Ник</th><th>Роль</th><th>Контракты</th><th>РП-премия</th><th>Итого</th><th>Действия</th></tr></thead><tbody id="crmBody"></tbody></table></div>
+      </div>
+    </div>
+
+    <div id="s-med" class="sec">
+      <div style="margin-bottom:14px"><h2>🎥 Стримеры и Медиа-партнёры</h2></div>
+      <div class="card">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <input type="text" id="mdName" placeholder="Ник стримера" style="flex:1;min-width:130px">
+          <select id="mdProj" onchange="updMdServs()" style="flex:1;min-width:130px"><option value="Majestic RP">Majestic RP</option><option value="GTA 5 RP">GTA 5 RP</option><option value="Trace RP">Trace RP</option><option value="Arizona V">Arizona V</option><option value="Radmir / Мой Дом">Radmir / Мой Дом</option><option value="RMRP">RMRP</option></select>
+          <select id="mdServ" style="flex:1;min-width:120px"></select>
+          <select id="mdStatus" style="min-width:130px"><option value="live">🔴 В эфире (LIVE)</option><option value="off">⚫ Оффлайн</option></select>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input type="url" id="mdLink" placeholder="Ссылка на Twitch / YouTube / Kick" style="flex:2;min-width:180px">
+          <input type="text" id="mdPromo" placeholder="Промокод (по желанию)" style="flex:1;min-width:120px">
+          <button class="btn btn-p" onclick="addMedia()">+ Добавить канал</button>
+        </div>
+      </div>
+      <div class="grid" id="medBox"></div>
+    </div>
+
+    <div id="s-top" class="sec"><div style="margin-bottom:14px"><h2>🏆 Рейтинг активных семей</h2><p style="font-size:12px;color:var(--mut)">Семьи добавляются при создании Кабинета Лидера.</p></div><div id="topBox"></div></div>
+    <div id="s-ptop" class="sec"><div style="margin-bottom:14px"><h2>🏅 Топ активных игроков и Карма</h2></div><div id="pTopBox"></div></div>
+
+    <div id="s-cal" class="sec">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <div><h2>📅 Календарь сборов (Капты / ВЗХ / ФЗ)</h2></div>
+        <select id="userUtc" onchange="rCal()"><option value="3">Мой пояс: UTC+3</option><option value="1">UTC+1</option><option value="2">UTC+2</option><option value="4">UTC+4</option><option value="5">UTC+5</option><option value="6">UTC+6</option><option value="7">UTC+7</option><option value="8">UTC+8</option><option value="9">UTC+9</option><option value="10" selected>Мой пояс: UTC+10</option></select>
+      </div>
+      <div class="card" style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" id="evName" placeholder="Событие" style="flex:2"><input type="time" id="evTime" value="19:30" style="flex:1"><button class="btn btn-p" onclick="addEv()">+ Добавить (МСК)</button></div>
+      <div class="grid" id="calBox"></div>
+    </div>
+
+    <div id="s-tim" class="sec">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h2>⏱ Таймеры откатов (КД)</h2><button class="btn btn-o" onclick="beep()">🔔 Звук</button></div>
+      <div class="card" style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" id="tName" placeholder="Название" style="flex:2"><input type="number" id="tMin" placeholder="Минут" min="1" style="flex:1"><button class="btn btn-p" onclick="addTim()">+ Добавить</button></div>
+      <div class="grid" id="timBox"></div>
+    </div>
+
+    <div id="s-calc" class="sec">
+      <h2 style="margin-bottom:14px">🧮 Калькулятор перекупа, Рынок цен и Посты для ТП</h2>
+      <div class="grid">
+        <div class="card"><h3 style="font-size:16px;margin-bottom:10px">🚗 Калькулятор перекупа</h3><div class="fg"><label>Покупка ($)</label><input type="number" id="cBuy" value="1000000" oninput="calcTrade()"></div><div class="fg"><label>Тюнинг ($)</label><input type="number" id="cTun" value="50000" oninput="calcTrade()"></div><div class="fg"><label>Продажа ($)</label><input type="number" id="cSell" value="1250000" oninput="calcTrade()"></div><div class="fg"><label>Комиссия (%)</label><input type="number" id="cFee" value="5" oninput="calcTrade()"></div><div style="background:var(--bg);padding:12px;border-radius:8px;border:1px solid var(--brd)"><div style="font-size:12px;color:var(--mut)">Прибыль:</div><div id="cProfit" style="font-size:22px;font-weight:800;color:var(--grn)">+$137,500</div></div></div>
+        <div class="card"><h3 style="font-size:16px;margin-bottom:10px">✨ Пост для Торговой Площадки</h3><div class="fg"><label>Тип</label><select id="tpType"><option value="ПРОДАМ">🟢 ПРОДАМ</option><option value="КУПЛЮ">🔵 КУПЛЮ</option><option value="ОБМЕН">🔄 ОБМЕН</option></select></div><div class="fg"><label>Товар</label><input type="text" id="tpItem" placeholder="BMW M5 F90 FT"></div><div class="fg"><label>Цена</label><input type="text" id="tpPrice" placeholder="$14,500,000"></div><div class="fg"><label>Discord</label><input type="text" id="tpDisc" placeholder="username"></div><button class="btn btn-p" style="width:100%" onclick="copyTpPost()">✨ Скопировать для ТП</button></div>
+      </div>
+      <div class="card" style="margin-top:6px"><h3 style="font-size:16px;margin-bottom:10px">📊 Рынок цен</h3><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><select id="mkProj" onchange="updMkServs()" style="flex:1"><option value="Majestic RP">Majestic RP</option><option value="GTA 5 RP">GTA 5 RP</option><option value="Trace RP">Trace RP</option><option value="Arizona V">Arizona V</option><option value="Radmir / Мой Дом">Radmir / Мой Дом</option><option value="RMRP">RMRP</option></select><select id="mkServ" style="flex:1"></select><input type="text" id="mkItem" placeholder="Авто / Дом" style="flex:2"><input type="number" id="mkPrice" placeholder="Цена ($)" style="flex:1"><button class="btn btn-g btn-sm" onclick="addMarket()">+ Добавить</button></div><div id="marketBox" class="grid"></div></div>
+    </div>
+
+    <div id="s-bl" class="sec"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h2>🚫 Чёрный список (Сливщики / Кидалы)</h2><button class="btn btn-r" onclick="op('mBl')">+ Добавить в ЧС</button></div><input type="text" id="blSearch" placeholder="🔍 Поиск по нику или Discord..." oninput="rBl()" style="width:100%;margin-bottom:14px"><div class="grid" id="blBox"></div></div>
+    <div id="s-rules" class="sec"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h2>📜 Правила проектов</h2><select id="ruleProjSel" onchange="rRules()"><option value="hub">Общие правила RP-HUB</option><option value="majestic">Majestic RP</option><option value="gta5rp">GTA 5 RP</option><option value="tracerp">Trace RP</option><option value="arizonav">Arizona V</option><option value="radmir">Radmir / Мой Дом</option><option value="rmrp">RMRP</option></select></div><input type="text" id="ruleSearch" placeholder="🔍 Поиск..." oninput="rRules()" style="width:100%;margin-bottom:14px"><div id="rulesBox"></div></div>
+    <div id="s-rp" class="sec"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h2>📖 Шпаргалка РП</h2><select id="rpCatSel" onchange="rRp()"><option value="all">Все категории</option><option value="Отыгровки (Гос)">Отыгровки (Гос)</option><option value="Отыгровки (Медики)">Отыгровки (Медики)</option><option value="Отыгровки (Крайм)">Отыгровки (Крайм)</option><option value="Тен-коды">Тен-коды</option><option value="Мои бинды">Мои бинды</option></select></div><div class="card" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><input type="text" id="myBindTit" placeholder="Название бинда" style="flex:1"><input type="text" id="myBindTxt" placeholder="Текст (/me ...)" style="flex:2"><button class="btn btn-g btn-sm" onclick="addMyBind()">+ Бинд</button></div><input type="text" id="rpSearch" placeholder="🔍 Поиск..." oninput="rRp()" style="width:100%;margin-bottom:14px"><div class="grid" id="rpBox"></div></div>
+    <div id="s-promo" class="sec"><h2 style="margin-bottom:14px">🎁 Промокоды и реферальные бонусы</h2><div class="card" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"><select id="prProj"><option value="Majestic RP">Majestic RP</option><option value="GTA 5 RP">GTA 5 RP</option><option value="Trace RP">Trace RP</option><option value="Arizona V">Arizona V</option><option value="Radmir / Мой Дом">Radmir / Мой Дом</option><option value="RMRP">RMRP</option></select><input type="text" id="prCode" placeholder="Промокод" style="flex:1"><input type="text" id="prBonus" placeholder="Бонус" style="flex:2"><button class="btn btn-p btn-sm" onclick="addPromo()">+ Добавить код</button></div><div class="grid" id="promoBox"></div></div>
+    <div id="s-rev" class="sec"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h2>💬 Отзывы и Баги</h2><button class="btn btn-r btn-sm" onclick="op('mBug')">🐛 Сообщить о баге</button></div><div class="card"><input type="text" class="hp-field" id="hpRev"><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px"><input type="text" id="rNick" placeholder="Ваш ник" style="flex:2"><select id="rStar" style="flex:1"><option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐</option><option value="⭐⭐⭐⭐">⭐⭐⭐⭐</option><option value="💡 Идея">💡 Идея</option></select></div><textarea id="rText" rows="2" placeholder="Отзыв..." style="width:100%;margin-bottom:10px"></textarea><button class="btn btn-g" onclick="addRev()">Отправить</button></div><div class="grid" id="revBox"></div></div>
+    <div id="s-adm" class="sec"><h2 style="color:var(--red);margin-bottom:14px">🚨 Центр модерации</h2><div class="grid" id="admReportsBox"></div></div>
+    </div>
+    <footer><div>RP-HUB — независимый фанатский игровой портал.</div><div style="display:flex;gap:12px"><a onclick="sw('rules',document.querySelectorAll('.sidebar .tab'))">Правила</a><a onclick="op('mBug')">🐛 Баг</a></div></footer>
+  </main>
+</div>
+
+<div style="position:fixed;bottom:16px;right:18px;z-index:150"><button class="btn btn-p" onclick="op('mAuthorSocials')" style="box-shadow:0 6px 20px rgba(0,0,0,.6)">🌐 Соцсети автора</button></div>
+<div class="modal" id="mAuthorSocials"><div class="m-box" style="max-width:380px;text-align:center">
+  <h3 style="margin-bottom:6px">🌐 Соцсети автора RP-HUB</h3>
+  <p style="font-size:12px;color:var(--mut);margin-bottom:16px">Подписывайтесь, чтобы следить за обновлениями и стримами!</p>
+  <a href="https://www.twitch.tv/baron_qer/about" target="_blank" class="btn" style="width:100%;background:#9146FF;margin-bottom:10px;padding:11px">🟣 Twitch (Стримы)</a>
+  <a href="https://t.me/twich_anons" target="_blank" class="btn" style="width:100%;background:#229ED9;margin-bottom:10px;padding:11px">✈️ Telegram (ТГК)</a>
+  <a href="https://www.youtube.com/@user-baronchik" target="_blank" class="btn" style="width:100%;background:#FF0000;margin-bottom:10px;padding:11px">🔴 YouTube канал</a>
+  <a href="https://www.tiktok.com/@baronnevprime?_r=1&_t=ZP-961ciZJesqU" target="_blank" class="btn" style="width:100%;background:#111111;border:1px solid var(--brd);margin-bottom:14px;padding:11px">🎵 TikTok</a>
+  <button class="btn btn-o" style="width:100%" onclick="cl('mAuthorSocials')">Закрыть</button>
+</div></div>
+
+
+<div class="modal" id="mSettings"><div class="m-box">
+  <h3 style="margin-bottom:10px">⚙️ Настройки профиля и сайта</h3>
+  <div class="fg"><label>Ваши роли (можно выбрать несколько)</label>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;background:var(--bg);padding:8px 10px;border-radius:8px;border:1px solid var(--brd);font-size:12px">
+      <label style="display:flex;align-items:center;gap:5px;margin:0;cursor:pointer;color:var(--txt)"><input type="checkbox" checked disabled> 🎮 Игрок</label>
+      <label style="display:flex;align-items:center;gap:5px;margin:0;cursor:pointer;color:var(--txt)"><input type="checkbox" id="setRoleFam"> 👑 Лидер Фамы</label>
+      <label style="display:flex;align-items:center;gap:5px;margin:0;cursor:pointer;color:var(--txt)"><input type="checkbox" id="setRoleFrac"> 🏛 Лидер Фракции</label>
+    </div>
+  </div>
+  <div class="fg"><label>Где вы часто играете?</label>
+    <div style="display:flex;gap:6px">
+      <select id="setProj" onchange="updSetServs()" style="flex:1"><option value="all">Все проекты</option><option value="Majestic RP">Majestic RP</option><option value="GTA 5 RP">GTA 5 RP</option><option value="Trace RP">Trace RP</option><option value="Arizona V">Arizona V</option><option value="Radmir / Мой Дом">Radmir / Мой Дом</option><option value="RMRP">RMRP</option></select>
+      <select id="setServ" style="flex:1"><option value="all">Все серверы</option></select>
+    </div>
+  </div>
+  <div class="fg"><label>Текущий пароль</label><input type="text" id="setPassMask" readonly style="color:var(--mut);letter-spacing:1px"></div>
+  <div class="fg"><label>Сменить пароль</label><input type="password" id="setNewPass" placeholder="Новый пароль"></div>
+  <div class="fg"><label>2FA через Discord Webhook</label><input type="text" id="set2faWh" placeholder="https://discord.com..."></div>
+  <div class="fg"><label>Акцентный цвет кнопок</label><select id="setTheme"><option value="0">Discord (Синий)</option><option value="1">Majestic RP (Малиновый)</option><option value="2">GTA 5 RP (Оранжевый)</option><option value="3">Trace RP (Изумрудный)</option><option value="4">Arizona V (Алый)</option><option value="5">Radmir / Мой Дом (Голубой)</option></select></div>
+  <div class="fg"><label>Цвет фона сайта</label><div style="display:flex;gap:8px;align-items:center"><input type="color" id="setBgCol" value="#0d0f12" style="height:38px;padding:2px;flex:1"><button class="btn btn-o btn-sm" onclick="resetBg()">↺ Дефолт фон</button></div></div>
+  <div class="fg"><label>Картинка вместо фона (URL или файл)</label><input type="text" id="setBgUrl" placeholder="https://imgur.com..." style="margin-bottom:6px"><input type="file" id="setBgFile" accept="image/*" onchange="loadBgFile(this)"></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-o" onclick="cl('mSettings')">Отмена</button><button class="btn btn-g" onclick="saveSettings()">Сохранить</button></div>
+</div></div>
+
+<div class="modal" id="mAuth"><div class="m-box"><h3 style="margin-bottom:6px">Вход / Регистрация</h3><div class="fg"><label>Ваш тег Discord</label><input type="text" id="inDisc" placeholder="Ваш ник в Discord"></div><div class="fg"><label>Пароль от аккаунта</label><input type="password" id="inPass" placeholder="Пароль"></div><div class="fg" id="auth2faBox" style="display:none"><label style="color:var(--yel)">🔐 Код 2FA</label><input type="text" id="in2faCode"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-o" onclick="cl('mAuth')">Отмена</button><button class="btn btn-p" onclick="login()">Войти</button></div></div></div>
+
+<div class="modal" id="mPost"><div class="m-box">
+  <h3 style="margin-bottom:10px">Создать анкету</h3><input type="text" class="hp-field" id="hpPost">
+  <div class="fg"><label>Проект</label><select id="pProj" onchange="updModalServs();updModalFracs()"><option value="Majestic RP">Majestic RP</option><option value="GTA 5 RP">GTA 5 RP</option><option value="Trace RP">Trace RP</option><option value="Arizona V">Arizona V</option><option value="Radmir / Мой Дом">Radmir / Мой Дом</option><option value="RMRP">RMRP</option></select></div>
+  <div class="fg"><label>Сервер</label><select id="pServ"></select></div>
+  <div class="fg"><label>Направление</label><select id="pCat" onchange="toggleModalFields()"></select></div>
+  <div id="fracWrap" style="display:none"><div class="fg"><label id="subTypeLbl">Направление (Гос / Крайм)</label><select id="pFracType" onchange="updModalFracs()"><option value="Гос. фракция">Гос. фракция (ГОС)</option><option value="Крайм фракция">Крайм фракция (Крайм)</option></select></div><div class="fg"><label id="fracSelLbl">Укажите фракцию</label><select id="pFrac"></select></div></div>
+  <div id="famBannerWrap" style="display:none"><div style="background:rgba(242,63,66,.15);border:1px solid var(--red);color:#ff6b6b;padding:8px;border-radius:8px;font-size:11.5px;font-weight:700;margin-bottom:8px">🔞 СТРОГО ЗАПРЕЩЕНО загружать 18+ картинки!</div><div class="fg"><label>Баннер семьи (ссылка или файл)</label><input type="text" id="pImgUrl" placeholder="https://imgur.com..." style="margin-bottom:6px"><input type="file" id="pImgFile" accept="image/*" onchange="loadPostImg(this)"></div><label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut);margin-bottom:10px"><input type="checkbox" id="pNoNsfw" checked> Подтверждаю отсутствие 18+ контента</label></div>
+  <div class="fg"><label>Часовой пояс</label><select id="pTz"><option value="UTC+1">UTC+1</option><option value="UTC+2">UTC+2</option><option value="UTC+3" selected>UTC+3</option><option value="UTC+4">UTC+4</option><option value="UTC+5">UTC+5</option><option value="UTC+6">UTC+6</option><option value="UTC+7">UTC+7</option><option value="UTC+8">UTC+8</option><option value="UTC+9">UTC+9</option><option value="UTC+10">UTC+10</option></select></div>
+  <div class="fg"><label>Заголовок</label><input type="text" id="pTit"></div><div class="fg"><label>Описание</label><textarea id="pDesc" rows="3"></textarea></div><div class="fg"><label>Discord</label><input type="text" id="pDisc"></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-o" onclick="cl('mPost')">Отмена</button><button class="btn btn-g" onclick="addPost()">Опубликовать</button></div>
+</div></div>
+
+<div class="modal" id="mFast"><div class="m-box"><h3 style="margin-bottom:10px">⚡ Быстрый поиск пати на 2 часа</h3><div class="fg"><label>Проект и сервер</label><input type="text" id="faServ"></div><div class="fg"><label>Задача</label><input type="text" id="faTask"></div><div class="fg"><label>Discord</label><input type="text" id="faDisc"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-o" onclick="cl('mFast')">Отмена</button><button class="btn btn-p" onclick="addFast()">Запустить</button></div></div></div>
+<div class="modal" id="mApply"><div class="m-box"><h3 style="margin-bottom:4px">Заявка на вступление</h3><p id="applyTarget" style="font-size:12px;color:var(--acc);margin-bottom:12px"></p><input type="hidden" id="applyPostId"><div class="fg"><label>Ник и статик</label><input type="text" id="apName"></div><div class="fg"><label>Возраст</label><input type="number" id="apAge"></div><div class="fg"><label>Онлайн</label><select id="apOnline"><option>1–2 часа в день</option><option>2–4 часа в день</option><option selected>4–6 часов в день</option><option>6–8 часов в день</option><option>8+ часов в день</option></select></div><div class="fg"><label>Опыт</label><textarea id="apExp" rows="2"></textarea></div><div class="fg"><label>Discord</label><input type="text" id="apDisc"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-o" onclick="cl('mApply')">Отмена</button><button class="btn btn-g" onclick="sendApply()">Отправить</button></div></div></div>
+<div class="modal" id="mReport"><div class="m-box"><h3 style="color:var(--red);margin-bottom:6px">⚠️ Пожаловаться</h3><p id="repTargetInfo" style="font-size:12px;color:var(--mut);margin-bottom:12px"></p><input type="hidden" id="repPostId"><div class="fg"><label>Причина</label><select id="repReason"><option>Обман / Слив склада / RMT</option><option>Оскорбления</option><option>Спам / Реклама</option><option>18+ контент</option><option>Фейк</option></select></div><div class="fg"><label style="color:var(--yel)">Ссылка на доказательство (Обязательно)</label><input type="url" id="repProof" placeholder="https://imgur.com..."></div><div class="fg"><label>Комментарий</label><textarea id="repDesc" rows="2"></textarea></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-o" onclick="cl('mReport')">Отмена</button><button class="btn btn-r" onclick="sendReport()">Отправить</button></div></div></div>
+<div class="modal" id="mBug"><div class="m-box"><h3 style="margin-bottom:10px">🐛 Сообщить о баге</h3><div class="fg"><label>Раздел</label><input type="text" id="bgSec"></div><div class="fg"><label>Описание</label><textarea id="bgDesc" rows="3"></textarea></div><div class="fg"><label>Discord</label><input type="text" id="bgDisc"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-o" onclick="cl('mBug')">Отмена</button><button class="btn btn-r" onclick="sendBug()">Отправить</button></div></div></div>
+<div class="modal" id="mMem"><div class="m-box"><h3 style="margin-bottom:10px">Добавить бойца</h3><div class="fg"><label>Ник и статик</label><input type="text" id="mName"></div><div class="fg"><label>Роль</label><input type="text" id="mRole"></div><div class="fg"><label>Ставка ($)</label><input type="number" id="mRate" value="15000"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-o" onclick="cl('mMem')">Отмена</button><button class="btn btn-p" onclick="addMem()">Добавить</button></div></div></div>
+<div class="modal" id="mBl"><div class="m-box"><h3 style="margin-bottom:10px">Добавить в ЧС</h3><div class="fg"><label>Ник и статик</label><input type="text" id="blName"></div><div class="fg"><label>Discord</label><input type="text" id="blDisc"></div><div class="fg"><label>Причина</label><textarea id="blReason" rows="2"></textarea></div><div class="fg"><label style="color:var(--yel)">Ссылка на доказательство (Обязательно)</label><input type="url" id="blProof" placeholder="https://imgur.com..."></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-o" onclick="cl('mBl')">Отмена</button><button class="btn btn-r" onclick="addBl()">Внести в ЧС</button></div></div></div>
+<div class="modal" id="mRecPriv"><div class="m-box" style="max-width:380px"><h3 style="margin-bottom:8px">🔑 Восстановление пина</h3><div class="fg"><label>Секретное слово</label><input type="text" id="recPrivWord"></div><div class="fg"><label>Новый пин</label><input type="password" id="recPrivNew"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-o" onclick="cl('mRecPriv')">Отмена</button><button class="btn btn-g" onclick="recoverPriv()">Сбросить</button></div></div></div>
+<div class="modal" id="mRecCrm"><div class="m-box" style="max-width:380px"><h3 style="margin-bottom:8px">🔑 Восстановление пина семьи</h3><div class="fg"><label>Секретное слово</label><input type="text" id="recCrmWord"></div><div class="fg"><label>Новый пин</label><input type="password" id="recCrmNew"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-o" onclick="cl('mRecCrm')">Отмена</button><button class="btn btn-g" onclick="recoverCrm()">Сбросить</button></div></div></div>
+<div class="modal" id="mLeaderHelp"><div class="m-box"><h3 style="margin-bottom:10px">📖 Инструкция Лидера</h3><p style="font-size:13px;color:var(--mut);margin-bottom:12px">Нажимайте <b>+1</b> за контракты, <b>+РП</b> за премии и копируйте ведомость в Discord.</p><button class="btn btn-p" style="width:100%" onclick="cl('mLeaderHelp')">Понятно!</button></div></div>
+<div class="modal" id="mGuide"><div class="m-box" style="max-width:480px;border:1px solid var(--acc)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="bdg b-cat" id="gStep">Настройка ролей</span><button class="btn btn-o btn-sm" onclick="finishGuide()">Закрыть</button></div><h3 id="gTitle" style="font-size:19px;margin-bottom:8px">👋 Добро пожаловать в RP-HUB!</h3><div id="gBody"></div><div id="gNav" style="display:none"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_TAG = "baron_qer";
+const THEMES = [{name:"Discord",color:"#5865F2"},{name:"Majestic",color:"#eb3b5a"},{name:"GTA 5 RP",color:"#fa8231"},{name:"Trace RP",color:"#10b981"},{name:"Arizona V",color:"#ef4444"},{name:"Radmir",color:"#0ea5e9"}];
+const SAFE_DOMAINS = ["imgur.com","://imgur.com","yapx.ru","prnt.sc","ibb.co","postimg.cc","gyazo.com","://discordapp.com","media.discordapp.net","youtube.com","://youtube.com","youtu.be","twitch.tv","www.twitch.tv","clips.twitch.tv","kick.com","rutube.ru","vk.com","vkvideo.ru","://google.com","disk.yandex.ru","streamable.com","t.me","tiktok.com","://tiktok.com"];
+const BAD_WORDS = ["хуй","пизд","бля","еба","сука","мудак","пидор","гандон","шлюх","даун","уеб"];
+
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function hasBadWords(s){const l=String(s||'').toLowerCase();return BAD_WORDS.some(w=>l.includes(w))}
+function isSafeUrl(u){try{const h=new URL(u).hostname.toLowerCase();return SAFE_DOMAINS.some(d=>h===d||h.endsWith('.'+d))}catch(e){return false}}
+function showTopRedAlert(txt){const el=document.getElementById('topAlert');el.textContent=txt;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),4500)}
+function msg(t,err){const el=document.getElementById('toast');el.textContent=t;el.style.background=err?'var(--red)':'var(--grn)';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3500)}
+
+let cdTimers = {};
+function checkCooldown(key, sec){if(user&&user.toLowerCase()===ADMIN_TAG)return true;const now=Date.now(),left=Math.ceil(((cdTimers[key]||0)-now)/1000);if(left>0){msg(`⏳ Подождите ${left} сек.`,1);return false}cdTimers[key]=now+sec*1000;return true}
+
+const SERVERS = {"Majestic RP":["New York","Detroit","Chicago","San Francisco","Atlanta","San Diego","Los Angeles","Miami","Las Vegas","Washington","Dallas","Boston","Houston","Seattle","Phoenix","Denver","Portland","Orlando","Memphis"],"GTA 5 RP":["Downtown","Strawberry","Vinewood","Blackberry","InSquad","Sunrise","Rainbow","Richman","Eclipse","LaMesa","Burton","Rockford","Alta","Del Perro","Davis","Harmony","Redwood","Hawick","Grapeseed","Murrieta","Vespucci"],"Trace RP":["Trace RP #1","Trace RP #2","Основной сервер Trace RP"],"Arizona V":["Liberty","Milton","Dallas"],"Radmir / Мой Дом":["Radmir 01","Radmir 02","Radmir 03","Мой Дом (Россия)"],"RMRP":["Рублёвка","Арбат","Патрики","Тверской","Кутузовский","Лубянка"]};
+const GTA_GOS = ["LSPD","LSSD / LSCSD","FIB","GOV (Правительство)","EMS (Медики)","Weazel News","Army / SANG","SASPA (Тюрьма)"];
+const GTA_CRIME = ["The Families","Ballas Gang","Los Santos Vagos","Marabunta Grande","Bloods Street","Russian Mafia","Yakuza","La Cosa Nostra","Armenian Mafia","Mexican Cartel"];
+const CRMP_GOS = ["МВД / Полиция","ГИБДД / ДПС","ФСБ","СОБР / Росгвардия","Правительство","Минздрав / СМП","Армия (МО)","СМИ / ТРК","ФСИН"];
+const CRMP_CRIME = ["ОПГ Ореховская","ОПГ Солнцевская","ОПГ Измайловская","ОПГ Тамбовская","ОПГ Люберецкая","Кавказская Мафия","Чеченская Мафия","ЧОП"];
+const FRACTIONS = {"Majestic RP":{"Гос. фракция":GTA_GOS,"Крайм фракция":GTA_CRIME},"GTA 5 RP":{"Гос. фракция":GTA_GOS,"Крайм фракция":GTA_CRIME},"Trace RP":{"Гос. фракция":GTA_GOS,"Крайм фракция":GTA_CRIME},"Arizona V":{"Гос. фракция":GTA_GOS,"Крайм фракция":GTA_CRIME},"Radmir / Мой Дом":{"Гос. фракция":CRMP_GOS,"Крайм фракция":CRMP_CRIME},"RMRP":{"Гос. фракция":CRMP_GOS,"Крайм фракция":CRMP_CRIME}};
+
+function updModalServs(){const p=document.getElementById('pProj').value;document.getElementById('pServ').innerHTML=(SERVERS[p]||[]).map(s=>`<option value="${s}">${s}</option>`).join('')}
+function updMdServs(){const p=document.getElementById('mdProj').value;document.getElementById('mdServ').innerHTML=(SERVERS[p]||[]).map(s=>`<option value="${s}">${s}</option>`).join('')}
+function updMkServs(){const p=document.getElementById('mkProj').value;document.getElementById('mkServ').innerHTML=(SERVERS[p]||[]).map(s=>`<option value="${s}">${s}</option>`).join('')}
+function buildPostCatOptions(){const isAdm=user&&user.toLowerCase()===ADMIN_TAG;let opts=[];if(isAdm||cfg.roles.fam)opts.push('<option value="Набор в семью (ГОС / Крайм)">Набор в семью (ГОС / Крайм)</option>');if(isAdm||cfg.roles.frac)opts.push('<option value="Набор во фракцию (ГОС / Крайм)">Набор во фракцию (ГОС / Крайм)</option>');opts.push('<option value="Ищу друга / команду">Ищу друга / команду</option>');document.getElementById('pCat').innerHTML=opts.join('')}
+function toggleModalFields(){const c=document.getElementById('pCat').value,isFam=c==='Набор в семью (ГОС / Крайм)',isFrac=c==='Набор во фракцию (ГОС / Крайм)';document.getElementById('fracWrap').style.display=(isFam||isFrac)?'block':'none';document.getElementById('famBannerWrap').style.display=isFam?'block':'none';if(isFam){document.getElementById('subTypeLbl').textContent='Направление семьи (Гос или Крайм)';document.getElementById('fracSelLbl').textContent='Укажите фракцию, с которой играет семья';updModalFracs()}else if(isFrac){document.getElementById('subTypeLbl').textContent='Тип фракции (Гос или Крайм)';document.getElementById('fracSelLbl').textContent='Укажите вашу фракцию';updModalFracs()}}
+function updModalFracs(){const p=document.getElementById('pProj').value,t=document.getElementById('pFracType').value;document.getElementById('pFrac').innerHTML=((FRACTIONS[p]&&FRACTIONS[p][t])||[]).map(f=>`<option value="${f}">${f}</option>`).join('')}
+function updFilterServs(){const p=document.getElementById('fProj').value,sel=document.getElementById('fServ');if(p==='all'){sel.innerHTML='<option value="all">Все серверы</option>';return}sel.innerHTML='<option value="all">Все серверы ('+p+')</option>'+(SERVERS[p]||[]).map(s=>`<option value="${s}">${s}</option>`).join('')}
+function updFilterFrac(){const c=document.getElementById('fCat').value,isSub=(c==='Набор в семью (ГОС / Крайм)'||c==='Набор во фракцию (ГОС / Крайм)'),subSel=document.getElementById('fSubType'),sel=document.getElementById('fFrac');if(!isSub){subSel.style.display='none';sel.style.display='none';subSel.value='all';sel.value='all';return}subSel.style.display='inline-block';sel.style.display='inline-block';const p=document.getElementById('fProj').value,st=subSel.value;let g=[],cr=[];if(p==='all'){Object.values(FRACTIONS).forEach(o=>{g.push(...o["Гос. фракция"]);cr.push(...o["Крайм фракция"])});g=[...new Set(g)];cr=[...new Set(cr)]}else if(FRACTIONS[p]){g=FRACTIONS[p]["Гос. фракция"];cr=FRACTIONS[p]["Крайм фракция"]}let html='<option value="all">Все фракции</option>';if(st==='all'||st==='Гос.')html+='<optgroup label="Гос. фракции">'+g.map(f=>`<option value="${f}">${f}</option>`).join('')+'</optgroup>';if(st==='all'||st==='Крайм')html+='<optgroup label="Крайм фракции">'+cr.map(f=>`<option value="${f}">${f}</option>`).join('')+'</optgroup>';sel.innerHTML=html}
+function updSetServs(){const p=document.getElementById('setProj').value,sel=document.getElementById('setServ');if(p==='all'){sel.innerHTML='<option value="all">Все серверы</option>';return}sel.innerHTML='<option value="all">Все серверы</option>'+(SERVERS[p]||[]).map(s=>`<option value="${s}">${s}</option>`).join('')}
+
+let usersDB = JSON.parse(localStorage.getItem('rh_users_db')) || {};
+let user = JSON.parse(localStorage.getItem('rh_u')) || null;
+let userStatus = localStorage.getItem('rh_ust') || '🟢 Готов играть';
+let cfg = JSON.parse(localStorage.getItem('rh_cfg_v2')) || {theme:0, bgCol:"#0d0f12", bgImg:"", favProj:"all", favServ:"all", roles:{player:true,fam:false,frac:false}};
+if(!cfg.roles) cfg.roles={player:true,fam:false,frac:false};
+let pending2FA = null, tempBgData = "", tempPostImgData = "";
+
+function applyCfg(){document.documentElement.style.setProperty('--acc',THEMES[cfg.theme||0].color);document.documentElement.style.setProperty('--bg',cfg.bgCol||'#0d0f12');document.documentElement.style.setProperty('--bgimg',cfg.bgImg?`url('${cfg.bgImg}')`:'none')}
+applyCfg();
+function loadBgFile(inp){const f=inp.files;if(!f)return;const r=new FileReader();r.onload=e=>{tempBgData=e.target.result;msg('Картинка фона загружена! Нажмите «Сохранить»')};r.readAsDataURL(f)}
+function loadPostImg(inp){const f=inp.files;if(!f)return;const r=new FileReader();r.onload=e=>{tempPostImgData=e.target.result;msg('Баннер семьи прикреплён!')};r.readAsDataURL(f)}
+function resetBg(){cfg.bgCol="#0d0f12";cfg.bgImg="";tempBgData="";document.getElementById('setBgCol').value="#0d0f12";document.getElementById('setBgUrl').value="";localStorage.setItem('rh_cfg_v2',JSON.stringify(cfg));applyCfg();msg('↺ Возвращён стандартный фон!')}
+function maskPassword(p){if(!p)return'Не задан';if(p.length<=2)return p+'*';return p.slice(0,2)+'*'.repeat(Math.max(6,p.length-2))}
+function openSettings(){document.getElementById('setRoleFam').checked=!!cfg.roles.fam;document.getElementById('setRoleFrac').checked=!!cfg.roles.frac;document.getElementById('setProj').value=cfg.favProj||'all';updSetServs();document.getElementById('setServ').value=cfg.favServ||'all';const uObj=user?usersDB[user.toLowerCase()]:null;document.getElementById('setPassMask').value=uObj?maskPassword(uObj.pass):'Войдите в аккаунт';document.getElementById('set2faWh').value=uObj?(uObj.wh2fa||''):'';document.getElementById('setTheme').value=cfg.theme||0;document.getElementById('setBgCol').value=cfg.bgCol||'#0d0f12';document.getElementById('setBgUrl').value=(cfg.bgImg&&!cfg.bgImg.startsWith('data:'))?cfg.bgImg:''}
+function saveSettings(){cfg.roles.fam=document.getElementById('setRoleFam').checked;cfg.roles.frac=document.getElementById('setRoleFrac').checked;cfg.favProj=document.getElementById('setProj').value;cfg.favServ=document.getElementById('setServ').value;cfg.theme=parseInt(document.getElementById('setTheme').value)||0;cfg.bgCol=document.getElementById('setBgCol').value;const uUrl=document.getElementById('setBgUrl').value.trim();if(tempBgData)cfg.bgImg=tempBgData;else if(uUrl)cfg.bgImg=uUrl;localStorage.setItem('rh_cfg_v2',JSON.stringify(cfg));applyCfg();if(user&&usersDB[user.toLowerCase()]){const np=document.getElementById('setNewPass').value.trim();if(np)usersDB[user.toLowerCase()].pass=np;usersDB[user.toLowerCase()].wh2fa=document.getElementById('set2faWh').value.trim();localStorage.setItem('rh_users_db',JSON.stringify(usersDB))}applyFavServerFilter();cl('mSettings');msg('⚙️ Настройки и роли сохранены!')}
+function applyFavServerFilter(){if(cfg.favProj&&cfg.favProj!=='all'){document.getElementById('fProj').value=cfg.favProj;updFilterServs();if(cfg.favServ&&cfg.favServ!=='all')document.getElementById('fServ').value=cfg.favServ;rPosts()}}
+let posts = JSON.parse(localStorage.getItem('rh_p_v7')) || [{id:1,proj:"Trace RP",serv:"Trace RP #1",cat:"Набор во фракцию (ГОС / Крайм)",subType:"Гос.",frac:"FIB",tz:"UTC+3",tit:"Открыт набор в академию FIB на Trace RP",desc:"Знание законодательной базы, 18+, микрофон, стабильный онлайн.",disc:"fib_trace",ver:true,yel:"⭐ Топ-актив",closed:false,ts:Date.now(),img:""}];
+let fastList = JSON.parse(localStorage.getItem('rh_fast')) || [{id:1,serv:"Majestic RP | Dallas",task:"Ищу +1 на угон / инкассаторов прямо сейчас",disc:"fast_player",exp:Date.now()+7200000}];
+let apps = JSON.parse(localStorage.getItem('rh_apps')) || [];
+let reports = JSON.parse(localStorage.getItem('rh_reps')) || [];
+let privState = JSON.parse(localStorage.getItem('rh_priv_v2')) || {created:false,pin:"",word:"",bal:0,goals:[],logs:[],pass:{name:"",age:"",spec:"🎮 Новичок",clip:"",yt:"",tw:"",st:"",bio:""}};
+let privUnlocked = false;
+let crmState = JSON.parse(localStorage.getItem('rh_crm_v2')) || {created:false,famName:"",serv:"",pin:"",word:"",wh:"",bank:0,bankLogs:[],mems:[]};
+let crmUnlocked = false;
+let fams = JSON.parse(localStorage.getItem('rh_f_v2')) || [];
+let pTop = JSON.parse(localStorage.getItem('rh_ptop_v2')) || [];
+let medias = JSON.parse(localStorage.getItem('rh_med_v2')) || [{id:1,name:"baron_qer",proj:"Majestic RP | Dallas",status:"live",link:"https://www.twitch.tv/baron_qer/about"
+,promo:""}];
+let events = JSON.parse(localStorage.getItem('rh_ev')) || [{id:1,name:"ВЗХ (Война за хаммеры)",msk:"19:30"},{id:2,name:"Семейный капт",msk:"21:00"}];
+let alertedEvents = {};
+let tims = JSON.parse(localStorage.getItem('rh_t')) || [{id:'t1',name:"Семейный контракт",dur:7200,rem:7200,run:false}];
+let market = JSON.parse(localStorage.getItem('rh_mkt_v2')) || [{id:1,proj:"Majestic RP | Dallas",item:"BMW M5 F90 FT",price:14500000}];
+let bl = JSON.parse(localStorage.getItem('rh_bl_v2')) || [];
+let myBinds = JSON.parse(localStorage.getItem('rh_binds')) || [];
+let promos = JSON.parse(localStorage.getItem('rh_promos_v2')) || [];
+let revs = JSON.parse(localStorage.getItem('rh_r')) || [{id:1,nick:"baron_qer",star:"⭐⭐⭐⭐⭐",text:"Добро пожаловать в RP-HUB! Оставляйте отзывы и идеи.",mine:false,isBug:false}];
+
+function saveAll(){localStorage.setItem('rh_p_v7',JSON.stringify(posts));localStorage.setItem('rh_fast',JSON.stringify(fastList));localStorage.setItem('rh_apps',JSON.stringify(apps));localStorage.setItem('rh_reps',JSON.stringify(reports));localStorage.setItem('rh_priv_v2',JSON.stringify(privState));localStorage.setItem('rh_crm_v2',JSON.stringify(crmState));localStorage.setItem('rh_f_v2',JSON.stringify(fams));localStorage.setItem('rh_ptop_v2',JSON.stringify(pTop));localStorage.setItem('rh_med_v2',JSON.stringify(medias));localStorage.setItem('rh_ev',JSON.stringify(events));localStorage.setItem('rh_t',JSON.stringify(tims));localStorage.setItem('rh_mkt_v2',JSON.stringify(market));localStorage.setItem('rh_bl_v2',JSON.stringify(bl));localStorage.setItem('rh_binds',JSON.stringify(myBinds));localStorage.setItem('rh_promos_v2',JSON.stringify(promos));localStorage.setItem('rh_r',JSON.stringify(revs))}
+function op(id){if(id==='mSettings')openSettings();if(id==='mPost'){buildPostCatOptions();updModalServs();toggleModalFields();tempPostImgData='';}if(user){if(id==='mPost')document.getElementById('pDisc').value=user;if(id==='mFast')document.getElementById('faDisc').value=user;}document.getElementById(id).classList.add('open')}
+function cl(id){document.getElementById(id).classList.remove('open')}
+function sw(id,b){document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('s-'+id).classList.add('active');if(b)b.classList.add('active');if(id==='priv')renderPrivGate();if(id==='crm')renderCrmGate()}
+function cp(d){navigator.clipboard.writeText(d).then(()=>msg('Скопировано: '+d))}
+
+let streamMode = false;
+function toggleStreamMode(){streamMode=!streamMode;document.body.classList.toggle('stream-mode',streamMode);document.getElementById('smBtn').style.borderColor=streamMode?'var(--red)':'var(--brd)';msg(streamMode?'👁 Стример-мод ВКЛ':'👁 Стример-мод ВЫКЛ')}
+function setUStatus(val){userStatus=val;localStorage.setItem('rh_ust',val);msg('Статус: '+val)}
+function rAuth(){const isAdm=user&&user.toLowerCase()===ADMIN_TAG;document.getElementById('admTab').style.display=isAdm?'flex':'none';document.getElementById('authArea').innerHTML=user?`<div style="display:flex;gap:6px;align-items:center;background:var(--bg);padding:4px 8px;border-radius:8px;border:1px solid var(--brd);flex-wrap:wrap"><select onchange="setUStatus(this.value)" style="padding:3px 6px;font-size:11px;border:none;background:var(--card)"><option ${userStatus==='🟢 Готов играть'?'selected':''}>🟢 Готов играть</option><option ${userStatus==='⚔️ На капте / ВЗХ'?'selected':''}>⚔️ На капте / ВЗХ</option><option ${userStatus==='🟡 АФК / Фарм'?'selected':''}>🟡 АФК / Фарм</option></select><b style="font-size:13px">${esc(user)}</b>${isAdm?'<span class="bdg b-maj">ADMIN</span>':''}<button class="btn btn-o btn-sm" onclick="logout()">Выйти</button></div>`:`<button class="btn btn-p btn-sm" onclick="op('mAuth')">Войти через Discord</button>`;if(user&&document.getElementById('rNick'))document.getElementById('rNick').value=user}
+function login(){const d=document.getElementById('inDisc').value.trim(),p=document.getElementById('inPass').value.trim();if(!d||!p)return msg('Введите Discord и пароль!',1);const key=d.toLowerCase();if(usersDB[key]){if(usersDB[key].pass!==p)return msg('❌ Неверный пароль!',1);if(usersDB[key].wh2fa){if(!pending2FA){pending2FA=String(Math.floor(100000+Math.random()*900000));fetch(usersDB[key].wh2fa,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:`🔐 **Код 2FA:** \`${pending2FA}\``})}).catch(()=>{});document.getElementById('auth2faBox').style.display='block';return msg('🔐 Код 2FA отправлен в Discord!');}else if(document.getElementById('in2faCode').value.trim()!==pending2FA)return msg('❌ Неверный код 2FA!',1)}}else{usersDB[key]={pass:p,wh2fa:""};localStorage.setItem('rh_users_db',JSON.stringify(usersDB))}pending2FA=null;document.getElementById('auth2faBox').style.display='none';user=d;localStorage.setItem('rh_u',JSON.stringify(user));cl('mAuth');refreshAll();msg('Добро пожаловать, '+d+'!')}
+function logout(){user=null;localStorage.removeItem('rh_u');privUnlocked=false;crmUnlocked=false;refreshAll();msg('Вы вышли из аккаунта')}
+
+function rFast(){const now=Date.now();fastList=fastList.filter(x=>x.exp>now);document.getElementById('fastBox').innerHTML=fastList.length?fastList.map(f=>`<div style="min-width:240px;background:var(--bg);border:1px solid var(--brd);padding:10px;border-radius:10px;flex-shrink:0"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--acc);font-weight:700;margin-bottom:4px"><span>${esc(f.serv)}</span><span>⏳ ${Math.max(1,Math.floor((f.exp-now)/60000))} мин</span></div><div style="font-size:13px;font-weight:600;margin-bottom:8px">${esc(f.task)}</div><div style="display:flex;justify-content:space-between;align-items:center"><span class="hide-stream" style="font-size:11px;color:var(--mut)">💬 ${esc(f.disc)}</span><button class="btn btn-p btn-sm" onclick="cp('${esc(f.disc)}')">В пати</button></div></div>`).join(''):`<span style="font-size:12px;color:var(--mut)">Пока нет срочных поисков пати.</span>`}
+function addFast(){if(!checkCooldown('fast',120))return;const s=document.getElementById('faServ').value.trim(),t=document.getElementById('faTask').value.trim(),d=document.getElementById('faDisc').value.trim();if(!s||!t||!d)return msg('Заполните все поля!',1);if(hasBadWords(t))return msg('❌ Без мата!',1);fastList.unshift({id:Date.now(),serv:s,task:t,disc:d,exp:Date.now()+7200000});saveAll();rFast();cl('mFast');msg('⚡ Поиск пати запущен!')}
+
+function copyDiscordPost(id){const x=posts.find(p=>p.id===id);if(!x)return;cp(`🔥 **${x.tit.toUpperCase()}** 🔥\n🎮 **Проект:** ${x.proj} | **${x.serv}**\n📌 **Направление:** ${x.cat}\n${x.frac?`🏛 **Фракция:** ${x.subType||''} ${x.frac}\n`:''}🕒 **Прайм:** ${x.tz}\n📝 ${x.desc}\n💬 **Discord:** \`${x.disc}\``)}
+function toggleVerPost(id){const x=posts.find(p=>p.id===id);if(x){x.ver=!x.ver;saveAll();rPosts()}}
+function toggleYelPost(id){const x=posts.find(p=>p.id===id);if(x){x.yel=x.yel?'':'⭐ Выделено';saveAll();rPosts()}}
+function delPostImg(id){const x=posts.find(p=>p.id===id);if(x){x.img='';saveAll();rPosts()}}
+function delAllByAuthor(disc){posts=posts.filter(x=>x.disc.toLowerCase()!==disc.toLowerCase());saveAll();refreshAll()}
+
+function rPosts(){
+  const q=(document.getElementById('fSearch').value||'').toLowerCase(),p=document.getElementById('fProj').value,s=document.getElementById('fServ').value,c=document.getElementById('fCat').value,st=document.getElementById('fSubType').value,fr=document.getElementById('fFrac').value,t=document.getElementById('fTz').value,now=Date.now();
+  const fl=posts.filter(x=>(now-(x.ts||now)<604800000)&&(p==='all'||x.proj===p)&&(s==='all'||x.serv===s)&&(c==='all'||x.cat===c)&&(st==='all'||x.subType===st)&&(fr==='all'||x.frac===fr)&&(t==='all'||x.tz===t)&&(!q||x.tit.toLowerCase().includes(q)||x.desc.toLowerCase().includes(q)||x.disc.toLowerCase().includes(q)));
+  const isAdm=user&&user.toLowerCase()===ADMIN_TAG;
+  document.getElementById('postsBox').innerHTML=fl.length?fl.map(x=>{
+    let bc='b-oth';if(x.proj==='Majestic RP')bc='b-maj';else if(x.proj==='GTA 5 RP')bc='b-gta';else if(x.proj.includes('Radmir')||x.proj==='RMRP')bc='b-rad';
+    const canDel=isAdm||(user&&user.toLowerCase()===x.disc.toLowerCase());
+    const admTools=isAdm?`<button class="btn btn-o btn-sm" onclick="toggleVerPost(${x.id})">✔</button><button class="btn btn-o btn-sm" onclick="toggleYelPost(${x.id})">⭐</button><button class="btn btn-r btn-sm" onclick="delAllByAuthor('${esc(x.disc)}')">🧹</button>`:'';
+    const imgHtml=x.img?`<div style="margin-bottom:10px;position:relative"><img src="${esc(x.img)}" style="width:100%;max-height:150px;object-fit:cover;border-radius:8px">${isAdm?`<button class="btn btn-r btn-sm" onclick="delPostImg(${x.id})" style="position:absolute;top:6px;right:6px">🖼</button>`:''}</div>`:'';
+    return `<div class="card" style="display:flex;flex-direction:column;justify-content:space-between"><div>${imgHtml}<div style="display:flex;justify-content:space-between;gap:6px;margin-bottom:8px"><div style="display:flex;flex-wrap:wrap;gap:4px"><span class="bdg ${bc}">${esc(x.proj)} | ${esc(x.serv)}</span>${x.ver?'<span class="bdg b-ver">✔</span>':''}${x.yel?`<span class="bdg b-ach">${esc(x.yel)}</span>`:''}${x.closed?'<span class="bdg" style="color:var(--red)">🔒 Закрыт</span>':''}<span class="bdg b-cat">${esc(x.cat)}</span>${x.frac?`<span class="bdg b-st">🏛 ${esc(x.subType||'')} ${esc(x.frac)}</span>`:''}<span class="bdg b-tz">🕒 ${esc(x.tz)}</span></div><div style="display:flex;gap:3px">${admTools}${canDel?`<button class="btn btn-r btn-sm" onclick="delPost(${x.id})">🗑</button>`:''}<button class="btn btn-o btn-sm" onclick="copyDiscordPost(${x.id})">✨</button><button class="btn btn-o btn-sm" onclick="openReport(${x.id})">⚠️</button></div></div><div style="font-weight:700;font-size:16px;margin-bottom:6px">${esc(x.tit)}</div><div style="font-size:13px;color:var(--mut);margin-bottom:12px">${esc(x.desc)}</div></div><div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--brd);padding-top:10px"><span class="hide-stream" style="font-size:12px;color:var(--mut)">💬 ${esc(x.disc)}</span><div style="display:flex;gap:6px">${(x.cat.includes('Набор')&&!x.closed)?`<button class="btn btn-g btn-sm" onclick="openApply(${x.id})">📩 Заявка</button>`:''}<button class="btn btn-p btn-sm" onclick="cp('${esc(x.disc)}')">Discord</button></div></div></div>`;
+  }).join(''):`<div class="card" style="grid-column:1/-1;text-align:center;color:var(--mut)">Анкет пока нет</div>`;
+}
+function addPost(){
+  if(document.getElementById('hpPost').value||!checkCooldown('post',180))return;
+  const tit=document.getElementById('pTit').value.trim(),desc=document.getElementById('pDesc').value.trim(),disc=document.getElementById('pDisc').value.trim(),cat=document.getElementById('pCat').value;
+  if(!tit||!disc)return msg('Заполните заголовок и Discord!',1);
+  if(hasBadWords(tit)||hasBadWords(desc))return msg('❌ Без мата!',1);
+  const isFam=cat==='Набор в семью (ГОС / Крайм)',isFrac=cat==='Набор во фракцию (ГОС / Крайм)';let img="";
+  if(isFam){const uImg=document.getElementById('pImgUrl').value.trim();if(tempPostImgData||uImg){if(!document.getElementById('pNoNsfw').checked)return msg('❌ Подтвердите отсутствие 18+!',1);if(uImg&&!isSafeUrl(uImg))return msg('❌ Только Imgur, Yapx или Discord CDN!',1);img=tempPostImgData||uImg}}
+  posts.unshift({id:Date.now(),proj:document.getElementById('pProj').value,serv:document.getElementById('pServ').value,cat,subType:(isFam||isFrac)?document.getElementById('pFracType').value:'',frac:(isFam||isFrac)?document.getElementById('pFrac').value:'',tz:document.getElementById('pTz').value,tit,desc,disc,ver:false,yel:"",closed:false,ts:Date.now(),img});
+  addPlayerPts(disc,10);saveAll();refreshAll();cl('mPost');document.getElementById('pTit').value='';document.getElementById('pDesc').value='';msg('Анкета опубликована (+10 pts)!');
+}
+function delPost(id){posts=posts.filter(x=>x.id!==id);saveAll();refreshAll()}
+function bumpPost(id){if(!checkCooldown('bump_'+id,7200))return;const idx=posts.findIndex(x=>x.id===id);if(idx>-1){const it=posts.splice(idx,1);it.ts=Date.now();posts.unshift(it);saveAll();refreshAll();msg('🚀 Поднято в ТОП!')}}
+function toggleClosePost(id){const x=posts.find(p=>p.id===id);if(x){x.closed=!x.closed;saveAll();refreshAll()}}
+
+function openApply(postId){const p=posts.find(x=>x.id===postId);if(!p)return;document.getElementById('applyPostId').value=postId;document.getElementById('applyTarget').textContent=`Куда: ${p.tit} (${p.proj} | ${p.serv})`;if(privState.pass.name)document.getElementById('apName').value=privState.pass.name;if(privState.pass.age)document.getElementById('apAge').value=privState.pass.age;if(privState.pass.bio)document.getElementById('apExp').value=privState.pass.bio+(privState.pass.clip?' | Мувик: '+privState.pass.clip:'');if(user)document.getElementById('apDisc').value=user;document.getElementById('mApply').classList.add('open')}
+function sendApply(){if(!checkCooldown('apply',60))return;const postId=parseInt(document.getElementById('applyPostId').value),p=posts.find(x=>x.id===postId),name=document.getElementById('apName').value.trim(),disc=document.getElementById('apDisc').value.trim(),online=document.getElementById('apOnline').value,exp=document.getElementById('apExp').value.trim()||'Без описания';if(!name||!disc)return msg('Укажите ник и Discord!',1);if(hasBadWords(exp))return msg('❌ Без мата!',1);apps.unshift({id:Date.now(),postId,postTit:p?p.tit:'Семья',ownerDisc:p?p.disc:'',name,age:document.getElementById('apAge').value.trim()||'—',online,exp,disc});if(crmState.wh)fetch(crmState.wh,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:"RP-HUB",embeds:[{title:"📩 Новая заявка!",description:`**Кандидат:** ${name}\n**Онлайн:** ${online}\n**Опыт:** ${exp}\n**Discord:** \`${disc}\``,color:2336089}]})}).catch(()=>{});saveAll();refreshAll();cl('mApply');msg('Заявка отправлена!')}
+function rMy(){
+  const isAdm=user&&user.toLowerCase()===ADMIN_TAG,myApps=apps.filter(a=>isAdm||(user&&a.ownerDisc&&a.ownerDisc.toLowerCase()===user.toLowerCase())),badge=document.getElementById('appBadge');
+  if(myApps.length>0){badge.style.display='inline-block';badge.textContent=myApps.length}else{badge.style.display='none'}
+  document.getElementById('inAppsBox').innerHTML=myApps.length?myApps.map(a=>{const inBl=bl.find(b=>b.disc.toLowerCase()===a.disc.toLowerCase()||b.name.toLowerCase().includes(a.name.toLowerCase()));return `<div class="card"><div>${inBl?`<div style="background:rgba(242,63,66,.2);border:1px solid var(--red);color:#ff6b6b;padding:6px;border-radius:6px;font-size:11px;font-weight:700;margin-bottom:8px">🚨 В ЧС! (${esc(inBl.reason)})</div>`:''}<div style="font-size:11px;color:var(--acc);font-weight:700;margin-bottom:6px">📌 ${esc(a.postTit)}</div><div style="font-size:16px;font-weight:800;margin-bottom:6px">${esc(a.name)} (${esc(a.age)} лет)</div><div style="margin-bottom:8px"><span class="bdg b-st">🕒 ${esc(a.online)}</span></div><div style="font-size:13px;color:var(--mut);margin-bottom:12px">${esc(a.exp)}</div></div><div style="border-top:1px solid var(--brd);padding-top:10px;display:flex;justify-content:space-between;align-items:center"><span class="hide-stream" style="font-size:12px;color:var(--mut)">💬 ${esc(a.disc)}</span><div style="display:flex;gap:5px"><button class="btn btn-g btn-sm" onclick="acceptApp(${a.id})">✅ В CRM</button><button class="btn btn-p btn-sm" onclick="cp('${esc(a.disc)}')">Discord</button><button class="btn btn-r btn-sm" onclick="delApp(${a.id})">✕</button></div></div></div>`}).join(''):`<div class="card" style="grid-column:1/-1;text-align:center;color:var(--mut)">Входящих заявок нет</div>`;
+  const myPosts=posts.filter(x=>user&&x.disc.toLowerCase()===user.toLowerCase());
+  document.getElementById('myPostsBox').innerHTML=myPosts.length?myPosts.map(x=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:11px;color:var(--acc);font-weight:700">${esc(x.proj)} | ${esc(x.serv)} ${x.closed?'• 🔒 Закрыт':''}</div><b>${esc(x.tit)}</b></div><div style="display:flex;gap:5px"><button class="btn btn-p btn-sm" onclick="bumpPost(${x.id})">🚀 Поднять</button><button class="btn btn-o btn-sm" onclick="toggleClosePost(${x.id})">${x.closed?'🔓':'🔒'}</button><button class="btn btn-r btn-sm" onclick="delPost(${x.id})">🗑</button></div></div>`).join(''):`<div class="card" style="grid-column:1/-1;text-align:center;color:var(--mut)">У вас пока нет анкет</div>`;
+}
+function acceptApp(id){const a=apps.find(x=>x.id===id);if(!a)return;if(!crmState.created)return msg('Сначала создайте Кабинет Лидера!',1);crmState.mems.push({id:Date.now(),name:a.name,role:"Новичок",c:0,r:15000,rp:0});apps=apps.filter(x=>x.id!==id);saveAll();refreshAll();msg('Игрок принят!')}
+function delApp(id){apps=apps.filter(x=>x.id!==id);saveAll();refreshAll()}
+function renderPrivGate(){const isAdm=user&&user.toLowerCase()===ADMIN_TAG;if(isAdm&&privState.created)privUnlocked=true;document.getElementById('privSetup').style.display=!privState.created?'block':'none';document.getElementById('privLock').style.display=(privState.created&&!privUnlocked)?'block':'none';document.getElementById('privBody').style.display=(privState.created&&privUnlocked)?'block':'none';if(privUnlocked)rPriv()}
+function createPrivCab(){const p=document.getElementById('newPrivPin').value.trim(),w=document.getElementById('newPrivWord').value.trim();if(p.length<4||!w)return msg('Пин от 4 цифр и секретное слово обязательны!',1);privState.created=true;privState.pin=p;privState.word=w;privUnlocked=true;saveAll();renderPrivGate();showTopRedAlert('⚠️ Запомните свой пин-код!')}
+function unlockPriv(){if(document.getElementById('privPinIn').value===privState.pin){privUnlocked=true;renderPrivGate();msg('Кабинет открыт!')}else msg('❌ Неверный пин!',1)}
+function lockPriv(){privUnlocked=false;document.getElementById('privPinIn').value='';renderPrivGate()}
+function recoverPriv(){if(document.getElementById('recPrivWord').value.trim().toLowerCase()===privState.word.toLowerCase()){const np=document.getElementById('recPrivNew').value.trim();if(np.length<4)return msg('Пин от 4 символов!',1);privState.pin=np;saveAll();cl('mRecPriv');showTopRedAlert('⚠️ Новый пин сохранён!')}else msg('❌ Неверное слово!',1)}
+function savePassport(){const bio=document.getElementById('psBio').value.trim();if(hasBadWords(bio))return msg('❌ Без мата!',1);privState.pass={name:document.getElementById('psName').value.trim(),age:document.getElementById('psAge').value.trim(),spec:document.getElementById('psSpec').value,clip:document.getElementById('psClip').value.trim(),yt:document.getElementById('psYt').value.trim(),tw:document.getElementById('psTw').value.trim(),st:document.getElementById('psSt').value.trim(),bio};if(privState.pass.name)addPlayerPts(privState.pass.name,20);saveAll();rPriv();msg('🪪 Паспорт сохранён!')}
+function rPriv(){
+  const ps=privState.pass,isAdm=user&&user.toLowerCase()===ADMIN_TAG;
+  document.getElementById('psName').value=ps.name;document.getElementById('psAge').value=ps.age;document.getElementById('psSpec').value=ps.spec||'🎮 Новичок';document.getElementById('psClip').value=ps.clip;document.getElementById('psYt').value=ps.yt;document.getElementById('psTw').value=ps.tw;document.getElementById('psSt').value=ps.st;document.getElementById('psBio').value=ps.bio;
+  let achs=[];if(isAdm)achs.push('👑 Создатель RP-HUB');if(ps.clip)achs.push('🎯 Снайпер');if(privState.bal>=1000000)achs.push('💰 Миллионер');if(crmState.created)achs.push('🛡 Глава династии');if(ps.yt||ps.tw)achs.push('🎥 Контент-мейкер');
+  let soc='';if(ps.yt)soc+=`<a href="${esc(ps.yt)}" target="_blank" class="btn btn-sm" style="background:#FF0000">🔴 YouTube</a> `;if(ps.tw)soc+=`<a href="${esc(ps.tw)}" target="_blank" class="btn btn-sm" style="background:#9146FF">🟣 Twitch</a> `;if(ps.st)soc+=`<a href="${esc(ps.st)}" target="_blank" class="btn btn-sm" style="background:#171a21;border:1px solid var(--brd)">🔵 Steam</a> `;if(ps.clip)soc+=`<a href="${esc(ps.clip)}" target="_blank" class="btn btn-p btn-sm">🎬 Мувик</a>`;
+  document.getElementById('passPreview').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px"><span class="bdg b-ver">ПАСПОРТ RP-HUB</span><div>${achs.map(a=>`<span class="bdg b-ach" style="margin-left:4px">${a}</span>`).join('')}</div></div><h3 style="font-size:18px;margin-bottom:4px">${esc(ps.name||'Ник не указан')} <span style="font-size:12px;color:var(--mut)">(${esc(ps.age||'—')} лет)</span></h3><div style="margin-bottom:8px"><span class="bdg b-cat">${esc(ps.spec||'🎮 Новичок')}</span></div><p style="font-size:13px;color:var(--mut);margin-bottom:10px">${esc(ps.bio||'Заполните паспорт слева.')}</p><div style="display:flex;gap:6px;flex-wrap:wrap">${soc}</div>`;
+  document.getElementById('pBal').textContent='$'+privState.bal.toLocaleString();
+  document.getElementById('goalsListBox').innerHTML=privState.goals.map((g,i)=>{const pct=g.sum>0?Math.min(100,Math.max(0,Math.round((privState.bal/g.sum)*100))):0,left=Math.max(0,g.sum-privState.bal);return `<div style="background:var(--bg);padding:9px;border-radius:8px;border:1px solid var(--brd);margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><b>🎯 ${esc(g.name)} (${pct}%)</b><span>${pct>=100?'🎉 Достигнуто!':'Осталось: $'+left.toLocaleString()} <button class="btn btn-r btn-sm" style="padding:1px 5px;margin-left:4px" onclick="delGoal(${i})">✕</button></span></div><div style="width:100%;height:6px;background:var(--brd);border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${pct>=100?'var(--grn)':'var(--acc)'}"></div></div></div>`}).join('');
+  document.getElementById('privLogs').innerHTML=privState.logs.slice(0,10).map(l=>`<div style="padding:4px 0;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between"><span>${esc(l.n)}</span><b style="color:${l.t==='in'?'var(--grn)':'var(--red)'}">${l.t==='in'?'+':'-'}$${l.s.toLocaleString()}</b></div>`).join('');
+}
+function addGoal(){const n=document.getElementById('gNameIn').value.trim(),s=parseInt(document.getElementById('gSumIn').value);if(!n||!s)return msg('Укажите цель и сумму!',1);privState.goals.push({name:n,sum:s});saveAll();rPriv();document.getElementById('gNameIn').value='';document.getElementById('gSumIn').value=''}
+function delGoal(i){privState.goals.splice(i,1);saveAll();rPriv()}
+function addPrivLog(){const t=document.getElementById('pType').value,s=parseInt(document.getElementById('pSum').value),n=document.getElementById('pNote').value.trim()||'Операция';if(!s||s<=0)return msg('Укажите сумму!',1);privState.bal+=(t==='in'?s:-s);privState.logs.unshift({t,s,n});saveAll();rPriv();document.getElementById('pSum').value='';document.getElementById('pNote').value=''}
+function copyPassport(){const p=privState.pass;cp(`🪪 **ПАСПОРТ RP-HUB**\n👤 **Ник:** ${p.name||'—'} (${p.age||'—'} лет)\n⚔️ **Профиль:** ${p.spec||'—'}\n📝 **Опыт:** ${p.bio||'—'}\n💬 **Discord:** \`${user||'—'}\``)}
+
+function renderCrmGate(){const isAdm=user&&user.toLowerCase()===ADMIN_TAG;if(isAdm&&crmState.created)crmUnlocked=true;document.getElementById('crmSetup').style.display=!crmState.created?'block':'none';document.getElementById('crmLockScreen').style.display=(crmState.created&&!crmUnlocked)?'block':'none';document.getElementById('crmContent').style.display=(crmState.created&&crmUnlocked)?'block':'none';if(crmState.created){document.getElementById('crmLockTitle').textContent='🔒 Кабинет семьи: '+crmState.famName;document.getElementById('crmHeaderTitle').textContent='🛡 Кабинет: '+crmState.famName}if(crmUnlocked)rCRM()}
+function createCrmCab(){const fn=document.getElementById('newCrmFam').value.trim(),sv=document.getElementById('newCrmServ').value.trim()||'Majestic RP',p=document.getElementById('newCrmPin').value.trim(),w=document.getElementById('newCrmWord').value.trim();if(!fn||p.length<4||!w)return msg('Заполните все поля (пин от 4 цифр)!',1);crmState={created:true,famName:fn,serv:sv,pin:p,word:w,wh:"",bank:0,bankLogs:[],mems:[]};crmUnlocked=true;if(!fams.some(x=>x.name.toLowerCase()===fn.toLowerCase()))fams.push({id:Date.now(),name:fn,serv:sv,st:"Открыт набор",disc:user||"leader",sc:50,likes:1,voted:{},ver:false});saveAll();renderCrmGate();rTop();showTopRedAlert('⚠️ Запомните свой пин-код!')}
+function unlockCRM(){if(document.getElementById('crmPinInput').value===crmState.pin){crmUnlocked=true;renderCrmGate();msg('Кабинет открыт!')}else msg('❌ Неверный пин!',1)}
+function lockCRM(){crmUnlocked=false;document.getElementById('crmPinInput').value='';renderCrmGate()}
+function recoverCrm(){if(document.getElementById('recCrmWord').value.trim().toLowerCase()===crmState.word.toLowerCase()){const np=document.getElementById('recCrmNew').value.trim();if(np.length<4)return msg('Пин от 4 символов!',1);crmState.pin=np;saveAll();cl('mRecCrm');showTopRedAlert('⚠️ Новый пин сохранён!')}else msg('❌ Неверное слово!',1)}
+function saveWebhook(){crmState.wh=document.getElementById('whUrlIn').value.trim();saveAll();msg('🔗 Webhook сохранён!')}
+function testWebhook(){if(!crmState.wh)return msg('Вставьте Webhook!',1);fetch(crmState.wh,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:'✅ **Тест связи RP-HUB:** Уведомления подключены!'})}).then(()=>msg('🔔 Отправлено!'))}
+function addBankLog(){const t=document.getElementById('bankType').value,s=parseInt(document.getElementById('bankSum').value),n=document.getElementById('bankNote').value.trim()||'Операция';if(!s||s<=0)return msg('Укажите сумму!',1);crmState.bank+=(t==='in'?s:-s);crmState.bankLogs.unshift({t,s,n});saveAll();rCRM();document.getElementById('bankSum').value='';document.getElementById('bankNote').value=''}
+function rCRM(){
+  document.getElementById('whUrlIn').value=crmState.wh||'';let tc=0,tp=0;
+  document.getElementById('crmBody').innerHTML=crmState.mems.map(m=>{const cPay=m.c*m.r,rpPay=m.rp||0,tot=cPay+rpPay;tc+=m.c;tp+=tot;return `<tr><td><b>${esc(m.name)}</b></td><td><span class="bdg b-cat">${esc(m.role)}</span></td><td><b>${m.c}</b> ($${cPay.toLocaleString()})</td><td style="color:var(--acc)">$${rpPay.toLocaleString()}</td><td class="hide-stream" style="color:var(--grn);font-weight:700">$${tot.toLocaleString()}</td><td><button class="btn btn-g btn-sm" onclick="addC(${m.id})">+1</button> <button class="btn btn-p btn-sm" onclick="addRpBonus(${m.id})">+РП</button> <button class="btn btn-o btn-sm" onclick="rstM(${m.id})">💸</button> <button class="btn btn-r btn-sm" onclick="delM(${m.id})">✕</button></td></tr>`}).join('');
+  document.getElementById('stBank').textContent='$'+crmState.bank.toLocaleString();document.getElementById('stM').textContent=crmState.mems.length;document.getElementById('stC').textContent=tc;document.getElementById('stP').textContent='$'+tp.toLocaleString();
+  document.getElementById('bankLogsBox').innerHTML=crmState.bankLogs.slice(0,10).map(l=>`<div style="padding:4px 0;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between"><span>${esc(l.n)}</span><b style="color:${l.t==='in'?'var(--grn)':'var(--red)'}">${l.t==='in'?'+':'-'}$${l.s.toLocaleString()}</b></div>`).join('');
+}
+function addMem(){const n=document.getElementById('mName').value.trim();if(!n)return msg('Введите ник!',1);crmState.mems.push({id:Date.now(),name:n,role:document.getElementById('mRole').value.trim()||'Боец',c:0,r:parseInt(document.getElementById('mRate').value)||15000,rp:0});saveAll();rCRM();cl('mMem');document.getElementById('mName').value=''}
+function addC(id){const m=crmState.mems.find(x=>x.id===id);if(m){m.c++;addPlayerPts(m.name,15);const f=fams.find(x=>x.name.toLowerCase()===crmState.famName.toLowerCase());if(f)f.sc+=10;saveAll();rCRM();rTop();msg('+1 контракт (+15 pts)')}}
+function addRpBonus(id){const m=crmState.mems.find(x=>x.id===id);if(!m)return;const sum=parseInt(prompt(`Премия за РП-контент для ${m.name} ($):`,'25000'));if(sum&&sum>0){m.rp=(m.rp||0)+sum;saveAll();rCRM();msg('Премия начислена!')}}
+function rstM(id){const m=crmState.mems.find(x=>x.id===id);if(m){m.c=0;m.rp=0;saveAll();rCRM();msg('Выплачено!')}}
+function delM(id){crmState.mems=crmState.mems.filter(x=>x.id!==id);saveAll();rCRM()}
+function copyPayoutReport(){if(!crmState.mems.length)return msg('Список пуст!',1);cp(`💰 **ВЕДОМОСТЬ СЕМЬИ ${crmState.famName.toUpperCase()}**\n`+crmState.mems.map(m=>`• **${m.name}** — Контр.: ${m.c} | РП: $${(m.rp||0).toLocaleString()} | **Итого: $${(m.c*m.r+(m.rp||0)).toLocaleString()}**`).join('\n'))}
+function exportBackup(type){const blob=new Blob([JSON.stringify(type==='priv'?privState:crmState)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`rphub_${type}_backup.json`;a.click();msg('💾 Бэкап скачан!')}
+
+function likeFam(id){const v=(user||'guest').toLowerCase(),f=fams.find(x=>x.id===id);if(!f)return;if(!f.voted)f.voted={};if(f.voted[v])return msg('Вы уже голосовали!',1);f.likes=(f.likes||0)+1;f.voted[v]=1;saveAll();rTop();msg('👍 Голос учтён!')}
+function delFam(id){fams=fams.filter(x=>x.id!==id);saveAll();rTop()}
+function rTop(){const isAdm=user&&user.toLowerCase()===ADMIN_TAG,s=[...fams].sort((a,b)=>b.sc-a.sc);document.getElementById('topBox').innerHTML=s.length?s.map((f,i)=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:12px"><div style="width:30px;height:30px;border-radius:8px;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-weight:800">#${i+1}</div><div><b>${esc(f.name)}</b><div style="font-size:12px;color:var(--mut)">${esc(f.serv)} • <span class="bdg b-st">${esc(f.st)}</span></div></div></div><div style="display:flex;align-items:center;gap:8px"><button class="btn btn-o btn-sm" onclick="likeFam(${f.id})">👍 ${f.likes||0}</button><b style="color:var(--yel)">${f.sc} pts</b><button class="btn btn-p btn-sm" onclick="cp('${esc(f.disc)}')">Вступить</button>${isAdm?`<button class="btn btn-r btn-sm" onclick="delFam(${f.id})">🗑</button>`:''}</div></div>`).join(''):`<div class="card" style="text-align:center;color:var(--mut)">Семьи добавляются автоматически при создании Кабинета Лидера.</div>`}
+function addPlayerPts(nick,pts){if(!nick||nick.toLowerCase()==='xatashi nomadied')return;let pl=pTop.find(x=>x.nick.toLowerCase()===nick.toLowerCase());if(pl)pl.pts+=pts;else pTop.push({id:Date.now(),nick,proj:cfg.favProj!=='all'?cfg.favProj:'GTA 5 RP',pts,rep:1,voted:{}})}
+function voteRep(id,delta){const v=(user||'guest').toLowerCase(),pl=pTop.find(x=>x.id===id);if(!pl)return;if(!pl.voted)pl.voted={};if(pl.voted[v]===delta)return msg('Вы уже оценили!',1);pl.rep=(pl.rep||0)+delta;pl.voted[v]=delta;saveAll();rPTop();msg(delta>0?'⭐ +реп!':'⚠️ -реп!')}
+function rPTop(){
+  const s=[...pTop].filter(x=>x.nick.toLowerCase()!=='xatashi nomadied').sort((a,b)=>b.pts-a.pts);
+  const zero=`<div class="card" style="border-color:var(--yel);background:linear-gradient(90deg,rgba(240,178,50,.12),rgba(22,25,32,.95));display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:12px"><div style="width:32px;height:32px;border-radius:8px;background:var(--yel);color:#000;display:flex;align-items:center;justify-content:center;font-weight:900">#0</div><div><b style="font-size:16px">Xatashi Nomadied</b> <span class="bdg b-ach">👑 Легенда / Почётное место</span><div style="font-size:12px;color:var(--mut)">Все проекты RP-HUB • Особый статус</div></div></div><b style="color:var(--yel)">∞ pts</b></div>`;
+  document.getElementById('pTopBox').innerHTML=zero+s.map((p,i)=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:12px"><div style="width:30px;height:30px;border-radius:8px;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-weight:800">#${i+1}</div><div><b>${esc(p.nick)}</b> <span class="bdg b-ach">${p.pts>=500?'Легенда':(p.pts>=200?'Авторитет':(p.pts>=80?'Местный':'Новичок'))}</span><div style="font-size:12px;color:var(--mut)">${esc(p.proj)} • Карма: <b style="color:${p.rep>=0?'var(--grn)':'var(--red)'}">${p.rep>=0?'+':''}${p.rep} реп</b></div></div></div><div style="display:flex;align-items:center;gap:6px"><button class="btn btn-g btn-sm" onclick="voteRep(${p.id},1)">+реп</button><button class="btn btn-r btn-sm" onclick="voteRep(${p.id},-1)">-реп</button><b style="color:var(--acc);margin-left:6px">${p.pts} pts</b></div></div>`).join('');
+}
+
+function rMed(){const s=[...medias].sort((a,b)=>(b.status==='live')-(a.status==='live'));document.getElementById('medBox').innerHTML=s.map(m=>`<div class="card" style="${m.status==='live'?'border-color:var(--red)':''}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b>${m.status==='live'?'<span class="live-dot"></span>LIVE • ':''}${esc(m.name)}</b><span class="bdg b-oth">🎥 MEDIA</span></div><div style="font-size:12px;color:var(--mut);margin-bottom:10px"><span class="bdg b-cat">${esc(m.proj)}</span> ${m.promo?`• Промокод: <b style="color:var(--yel)">${esc(m.promo)}</b>`:''}</div><div style="display:flex;gap:6px"><a href="${esc(m.link)}" target="_blank" class="btn btn-p btn-sm" style="flex:1">Смотреть стрим</a>${m.promo?`<button class="btn btn-o btn-sm" onclick="cp('${esc(m.promo)}')">Промо</button>`:''}</div></div>`).join('')}
+function addMedia(){const n=document.getElementById('mdName').value.trim(),l=document.getElementById('mdLink').value.trim(),p=document.getElementById('mdProj').value+' | '+document.getElementById('mdServ').value;if(!n||!l)return msg('Укажите ник и ссылку!',1);if(!isSafeUrl(l))return msg('❌ Только Twitch, YouTube, Kick, VK, TG!',1);medias.unshift({id:Date.now(),name:n,proj:p,status:document.getElementById('mdStatus').value,link:l,promo:document.getElementById('mdPromo').value.trim()});saveAll();rMed();document.getElementById('mdName').value='';document.getElementById('mdLink').value='';msg('Канал добавлен!')}
+function convTime(msk,utc){const [h,m]=msk.split(':').map(Number);return String((h+(utc-3)+24)%24).padStart(2,'0')+':'+String(m).padStart(2,'0')}
+function getCountdownStr(msk){const now=new Date(),s1=((now.getUTCHours()+3)%24)*3600+now.getUTCMinutes()*60+now.getUTCSeconds(),[eh,em]=msk.split(':').map(Number),s2=eh*3600+em*60;let d=s2-s1;if(d<0)d+=86400;const p=n=>String(n).padStart(2,'0');return `${p(Math.floor(d/3600))} ч ${p(Math.floor((d%3600)/60))} мин ${p(d%60)} сек`}
+function copyEventDiscord(n,m){cp(`⚔️ **СБОР: ${n.toUpperCase()}**\n🕒 **Старт:** ${m} МСК\n📢 Всем зайти в войс за 10 минут!`)}
+function rCal(){const u=parseInt(document.getElementById('userUtc').value);document.getElementById('calBox').innerHTML=events.map(e=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>${esc(e.name)}</b><div style="font-size:12px;color:var(--mut)">МСК: ${e.msk} → <b style="color:var(--grn)">Ваше (UTC+${u}): ${convTime(e.msk,u)}</b></div><div style="font-size:12px;color:var(--yel);font-weight:700;margin-top:3px">⏳ До старта: ${getCountdownStr(e.msk)}</div></div><div style="display:flex;gap:5px"><button class="btn btn-o btn-sm" onclick="copyEventDiscord('${esc(e.name)}','${e.msk}')">📋</button><button class="btn btn-r btn-sm" onclick="delEv(${e.id})">✕</button></div></div>`).join('')}
+function addEv(){const n=document.getElementById('evName').value.trim(),t=document.getElementById('evTime').value;if(!n||!t)return msg('Заполните поля!',1);events.push({id:Date.now(),name:n,msk:t});saveAll();rCal();document.getElementById('evName').value='';msg('Сбор добавлен!')}
+function delEv(id){events=events.filter(x=>x.id!==id);saveAll();rCal()}
+function checkEventReminders(){const now=new Date(),m1=((now.getUTCHours()+3)%24)*60+now.getUTCMinutes();events.forEach(ev=>{const [eh,em]=ev.msk.split(':').map(Number);if((eh*60+em)-m1===10&&!alertedEvents[ev.id]){alertedEvents[ev.id]=true;beep();msg(`⚠️ Через 10 минут сбор: ${ev.name}!`)}})}
+
+function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator();o.frequency.setValueAtTime(750,c.currentTime);o.connect(c.destination);o.start();o.stop(c.currentTime+.3)}catch(e){}}
+function fmt(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60,p=n=>String(n).padStart(2,'0');return h>0?`${p(h)}:${p(m)}:${p(sc)}`:`${p(m)}:${p(sc)}`}
+function rTim(){document.getElementById('timBox').innerHTML=tims.map(t=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>${esc(t.name)}</b><div style="font-size:24px;font-weight:800;color:${t.rem===0?'var(--grn)':'var(--acc)'}">${t.rem===0?'ГОТОВО!':fmt(t.rem)}</div></div><div style="display:flex;gap:6px"><button class="btn ${t.run?'btn-o':'btn-g'} btn-sm" onclick="tTim('${t.id}')">${t.run?'Пауза':'Старт'}</button><button class="btn btn-o btn-sm" onclick="rstTim('${t.id}')">↻</button><button class="btn btn-r btn-sm" onclick="delTim('${t.id}')">✕</button></div></div>`).join('')}
+function tTim(id){const t=tims.find(x=>x.id===id);if(t){if(t.rem===0)t.rem=t.dur;t.run=!t.run;saveAll();rTim()}}
+function rstTim(id){const t=tims.find(x=>x.id===id);if(t){t.run=false;t.rem=t.dur;saveAll();rTim()}}
+function delTim(id){tims=tims.filter(x=>x.id!==id);saveAll();rTim()}
+function addTim(){const m=parseInt(document.getElementById('tMin').value);if(!m||m<=0)return msg('Укажите минуты!',1);tims.push({id:'t'+Date.now(),name:document.getElementById('tName').value.trim()||'Таймер',dur:m*60,rem:m*60,run:true});saveAll();rTim();document.getElementById('tName').value='';document.getElementById('tMin').value=''}
+
+function calcTrade(){const b=+document.getElementById('cBuy').value||0,t=+document.getElementById('cTun').value||0,s=+document.getElementById('cSell').value||0,f=+document.getElementById('cFee').value||0,p=Math.round(s*(1-f/100)-b-t),el=document.getElementById('cProfit');el.textContent=(p>=0?'+':'')+'$'+p.toLocaleString();el.style.color=p>=0?'var(--grn)':'var(--red)'}
+function copyTpPost(){const t=document.getElementById('tpType').value,i=document.getElementById('tpItem').value.trim(),p=document.getElementById('tpPrice').value.trim(),d=document.getElementById('tpDisc').value.trim()||user||'—';if(!i||!p)return msg('Укажите товар и цену!',1);cp(`📢 **[${t}] ${i.toUpperCase()}**\n💰 **Цена:** ${p}\n💬 **Discord:** \`${d}\``)}
+function rMarket(){document.getElementById('marketBox').innerHTML=market.map(m=>`<div class="card"><span class="bdg b-cat" style="margin-bottom:4px">${esc(m.proj)}</span><div style="font-weight:700">${esc(m.item)}</div><div style="color:var(--grn);font-weight:800;font-size:16px">$${m.price.toLocaleString()}</div></div>`).join('')}
+function addMarket(){const p=document.getElementById('mkProj').value+' | '+document.getElementById('mkServ').value,i=document.getElementById('mkItem').value.trim(),pr=parseInt(document.getElementById('mkPrice').value);if(!i||!pr)return msg('Укажите товар и цену!',1);market.unshift({id:Date.now(),proj:p,item:i,price:pr});saveAll();rMarket();document.getElementById('mkItem').value='';document.getElementById('mkPrice').value='';msg('Цена добавлена!')}
+
+function rBl(){const q=(document.getElementById('blSearch').value||'').toLowerCase(),isAdm=user&&user.toLowerCase()===ADMIN_TAG,fl=bl.filter(x=>x.name.toLowerCase().includes(q)||x.disc.toLowerCase().includes(q)||x.reason.toLowerCase().includes(q));document.getElementById('blBox').innerHTML=fl.length?fl.map(x=>`<div class="card" style="border-color:rgba(242,63,66,.4)"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><b style="color:var(--red)">🚫 ${esc(x.name)}</b>${isAdm?`<button class="btn btn-r btn-sm" onclick="delBl(${x.id})">🗑</button>`:''}</div><div style="font-size:12px;color:var(--mut);margin-bottom:6px">Discord: <b>${esc(x.disc)}</b></div><div style="font-size:13px;margin-bottom:10px">${esc(x.reason)}</div>${x.proof?`<a href="${esc(x.proof)}" target="_blank" class="btn btn-o btn-sm">🖼 Доказательства</a>`:''}</div>`).join(''):`<div class="card" style="grid-column:1/-1;text-align:center;color:var(--mut)">В чёрном списке пока никого нет</div>`}
+function addBl(){const n=document.getElementById('blName').value.trim(),r=document.getElementById('blReason').value.trim(),pr=document.getElementById('blProof').value.trim();if(!n||!r)return msg('Укажите ник и причину!',1);if(!pr)return msg('❌ Без ссылки на доказательства в ЧС заносить нельзя!',1);if(!isSafeUrl(pr))return msg('❌ Разрешены только проверенные хостинги (Imgur, YouTube, Twitch, ВК, Диск)!',1);bl.unshift({id:Date.now(),name:n,disc:document.getElementById('blDisc').value.trim()||'Неизвестен',reason:r,proof:pr});saveAll();rBl();cl('mBl');document.getElementById('blProof').value='';msg('Нарушитель внесён в ЧС!')}
+function delBl(id){bl=bl.filter(x=>x.id!==id);saveAll();rBl()}
+
+const RULES_DATA={hub:[{t:'Запрет RMT',d:'Продажа виртов/аккаунтов за реал = вечный бан.',url:''},{t:'Запрет скам-ссылок и 18+',d:'Фишинг и NSFW строго запрещены.',url:''}],majestic:[{t:'Официальный форум Majestic RP',d:'Правила серверов, каптов, ВЗХ, гос и крайм структур.',url:'https://majestic-rp.ru'}],gta5rp:[{t:'Официальный форум GTA 5 RP',d:'Правила серверов, ограблений, ЗЗ и фракций.',url:'https://gta5rp.com'}],tracerp:[{t:'Официальный портал Trace RP',d:'Актуальный свод правил Trace RP.',url:'https://tracerp.ru'}],arizonav:[{t:'Официальный форум Arizona V',d:'Правила серверов Liberty, Milton и Dallas.',url:'https://arizona-v.com'}],radmir:[{t:'Официальный форум Radmir / Мой Дом',d:'Правила проекта Radmir GTA 5 / Мой Дом.',url:'https://rgta5.ru'}],rmrp:[{t:'Официальный форум RMRP',d:'Правила серверов Рублёвка, Арбат, Патрики и др.',url:'https://rmrp.ru'}]};
+function rRules(){const p=document.getElementById('ruleProjSel').value,q=(document.getElementById('ruleSearch').value||'').toLowerCase();document.getElementById('rulesBox').innerHTML=(RULES_DATA[p]||[]).filter(x=>x.t.toLowerCase().includes(q)||x.d.toLowerCase().includes(q)).map(r=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><b>${esc(r.t)}</b><p style="font-size:13px;color:var(--mut);margin-top:4px">${esc(r.d)}</p></div>${r.url?`<a href="${r.url}" target="_blank" class="btn btn-p btn-sm">🔗 На форум</a>`:''}</div>`).join('')}
+
+const RP_DOCS=[{cat:"Отыгровки (Гос)",title:"Надевание наручников",txt:"/me резким движением снял наручники с тактического пояса и защёлкнул их на запястьях человека напротив"},{cat:"Отыгровки (Гос)",title:"Первичный обыск",txt:"/me надев резиновые перчатки, тщательно прохлопал верхнюю и нижнюю одежду задержанного"},{cat:"Отыгровки (Гос)",title:"Проверка документов",txt:"/me взял документ из рук человека, внимательно сверил фотографию и данные с базой КПК, затем вернул обратно"},{cat:"Отыгровки (Гос)",title:"Правило Миранды",txt:"Вы имеете право хранить молчание. Всё, что вы скажете, может и будет использовано против вас. Вы имеете право на адвоката и один телефонный звонок."},{cat:"Отыгровки (Медики)",title:"Реанимация (ПМП)",txt:"/do Медицинский чемоданчик в руке. /me открыл чемоданчик, достал дефибриллятор и произвёл разряд"},{cat:"Отыгровки (Медики)",title:"Выдача таблетки",txt:"/me открыл медицинскую сумку, достал блистер с обезболивающим, выдавил таблетку и передал пациенту вместе с водой"},{cat:"Отыгровки (Крайм)",title:"Надевание стяжек",txt:"/me достал из кармана пластиковые стяжки, заломил руки человеку за спину и туго затянул их"},{cat:"Отыгровки (Крайм)",title:"Ограбление (карманы)",txt:"/me грубо похлопал человека по карманам куртки и брюк в поисках наличных и ценных вещей"},{cat:"Тен-коды",title:"Коды рации и Code",txt:"10-4 Принято | 10-6 Занят | 10-20 Локация | Code 0 Офицер ранен | Code 1 Перестрелка | Code 4 Стабильно"}];
+function addMyBind(){const t=document.getElementById('myBindTit').value.trim(),txt=document.getElementById('myBindTxt').value.trim();if(!t||!txt)return msg('Заполните поля!',1);myBinds.unshift({cat:"Мои бинды",title:t,txt});saveAll();rRp();document.getElementById('myBindTit').value='';document.getElementById('myBindTxt').value='';msg('Бинд сохранён!')}
+function rRp(){const cat=document.getElementById('rpCatSel').value,q=(document.getElementById('rpSearch').value||'').toLowerCase();document.getElementById('rpBox').innerHTML=[...myBinds,...RP_DOCS].filter(d=>(cat==='all'||d.cat===cat)&&(d.title.toLowerCase().includes(q)||d.txt.toLowerCase().includes(q))).map(d=>`<div class="card" style="cursor:pointer" onclick="cp('${d.txt.replace(/'/g,"")}')"><span class="bdg b-cat" style="margin-bottom:6px">${esc(d.cat)}</span><div style="font-weight:700;margin-bottom:6px">${esc(d.title)}</div><div style="font-size:12px;color:var(--mut);background:var(--bg);padding:8px;border-radius:6px">${esc(d.txt)}</div></div>`).join('')}
+
+function addPromo(){const p=document.getElementById('prProj').value,c=document.getElementById('prCode').value.trim(),b=document.getElementById('prBonus').value.trim();if(!c||!b)return msg('Заполните поля!',1);promos.unshift({id:Date.now(),proj:p,code:c,bonus:b});saveAll();rPromo();document.getElementById('prCode').value='';document.getElementById('prBonus').value='';msg('Промокод добавлен!')}
+function delPromo(id){promos=promos.filter(x=>x.id!==id);saveAll();rPromo()}
+function rPromo(){const isAdm=user&&user.toLowerCase()===ADMIN_TAG;document.getElementById('promoBox').innerHTML=promos.length?promos.map(p=>`<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><b>${esc(p.proj)}</b>${isAdm?`<button class="btn btn-r btn-sm" onclick="delPromo(${p.id})">🗑</button>`:''}</div><div style="font-size:13px;color:var(--mut);margin-bottom:10px">${esc(p.bonus)}</div><div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg);padding:8px 12px;border-radius:8px;border:1px dashed var(--acc)"><b style="color:var(--yel)">${esc(p.code)}</b><button class="btn btn-p btn-sm" onclick="cp('${esc(p.code)}')">Копировать</button></div></div>`).join(''):`<div class="card" style="grid-column:1/-1;text-align:center;color:var(--mut)">Промокодов пока нет</div>`}
+
+function openReport(id){const p=posts.find(x=>x.id===id);if(!p)return;document.getElementById('repPostId').value=id;document.getElementById('repTargetInfo').textContent=`Нарушитель: ${p.disc}`;document.getElementById('repProof').value='';document.getElementById('repDesc').value='';op('mReport')}
+function sendReport(){if(!checkCooldown('rep',60))return;const id=parseInt(document.getElementById('repPostId').value),p=posts.find(x=>x.id===id),reason=document.getElementById('repReason').value,proof=document.getElementById('repProof').value.trim(),desc=document.getElementById('repDesc').value.trim(),sender=user||'Аноним';if(!proof)return msg('❌ Прикрепите ссылку на доказательство!',1);if(!isSafeUrl(proof)){reports.unshift({id:Date.now(),isScam:true,sender,target:p?p.disc:'—',postId:id,reason:'🚨 СКАМ-ССЫЛКА',proof,desc});saveAll();rAdmReports();cl('mReport');return msg('❌ Ссылка отклонена!',1)}reports.unshift({id:Date.now(),isScam:false,sender,target:p?p.disc:'—',postId:id,reason,proof,desc});saveAll();rAdmReports();cl('mReport');msg('✅ Жалоба отправлена!')}
+function rAdmReports(){const b=document.getElementById('repBadge');if(reports.length){b.style.display='inline-block';b.textContent=reports.length}else b.style.display='none';document.getElementById('admReportsBox').innerHTML=reports.length?reports.map(r=>`<div class="card" style="border-color:${r.isScam?'var(--red)':'var(--yel)'}"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><b style="color:${r.isScam?'var(--red)':'var(--yel)'}">${esc(r.reason)}</b><button class="btn btn-o btn-sm" onclick="delReport(${r.id})">✅</button></div><div style="font-size:12px;color:var(--mut);margin-bottom:6px">От: <b>${esc(r.sender)}</b> → На: <b>${esc(r.target)}</b></div><div style="font-size:13px;margin-bottom:10px">${esc(r.desc)}</div>${r.isScam?`<button class="btn btn-r btn-sm" onclick="banScammer('${esc(r.sender)}',${r.id},'${esc(r.proof)}')">🚫 В ЧС</button>`:`<a href="${esc(r.proof)}" target="_blank" class="btn btn-p btn-sm">🖼 Доказательство</a>`}</div>`).join(''):`<div class="card" style="grid-column:1/-1;text-align:center;color:var(--mut)">Жалоб нет</div>`}
+function delReport(id){reports=reports.filter(x=>x.id!==id);saveAll();rAdmReports()}
+function banScammer(n,id,pr){bl.unshift({id:Date.now(),name:n,disc:n,reason:'Скам-ссылка в жалобе',proof:pr});delReport(id);saveAll();rBl();msg('🚫 Внесён в ЧС!')}
+
+function rRev(){const isAdm=user&&user.toLowerCase()===ADMIN_TAG;document.getElementById('revBox').innerHTML=revs.map(r=>`<div class="card" style="${r.isBug?'border-color:var(--red)':''}"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><b>${esc(r.nick)} <span style="font-size:12px">${esc(r.star)}</span></b>${(isAdm||r.mine)?`<button class="btn btn-r btn-sm" onclick="delRev(${r.id})">🗑</button>`:''}</div><div style="font-size:13px;color:var(--mut)">${esc(r.text)}</div></div>`).join('')}
+function addRev(){if(document.getElementById('hpRev').value||!checkCooldown('rev',60))return;const nick=document.getElementById('rNick').value.trim()||user||'Аноним',text=document.getElementById('rText').value.trim();if(!text)return msg('Напишите отзыв!',1);if(hasBadWords(text))return msg('❌ Без мата!',1);revs.unshift({id:Date.now(),nick,star:document.getElementById('rStar').value,text,mine:true,isBug:false});saveAll();rRev();document.getElementById('rText').value='';msg('Спасибо!')}
+function sendBug(){if(!checkCooldown('bug',60))return;const s=document.getElementById('bgSec').value.trim()||'Общее',d=document.getElementById('bgDesc').value.trim(),u=document.getElementById('bgDisc').value.trim()||user||'Аноним';if(!d)return msg('Опишите баг!',1);revs.unshift({id:Date.now(),nick:u,star:'🐛 БАГ ('+s+')',text:d,mine:true,isBug:true});saveAll();rRev();cl('mBug');document.getElementById('bgDesc').value='';msg('🐛 Баг отправлен!')}
+function delRev(id){revs=revs.filter(x=>x.id!==id);saveAll();rRev()}
+
+function startGuide(){document.getElementById('gStep').textContent='Мультироль';document.getElementById('gTitle').textContent='👋 Добро пожаловать в RP-HUB! Кем вы играете?';document.getElementById('gBody').innerHTML=`<p style="font-size:13px;color:var(--mut);margin-bottom:12px">Можно выбрать <b>сразу несколько ролей</b>:</p><label class="role-chk"><input type="checkbox" checked disabled><span style="font-size:22px">🎮</span><div><b>Игрок</b><div style="font-size:12px;color:var(--mut)">Поиск команды, паспорт, кошелёк и калькулятор</div></div></label><label class="role-chk"><input type="checkbox" id="gChkFam" ${cfg.roles.fam?'checked':''}><span style="font-size:22px">👑</span><div><b>Лидер Фамы</b><div style="font-size:12px;color:var(--mut)">Создание наборов в семью и Кабинет Лидера</div></div></label><label class="role-chk"><input type="checkbox" id="gChkFrac" ${cfg.roles.frac?'checked':''}><span style="font-size:22px">🏛</span><div><b>Лидер Фракции</b><div style="font-size:12px;color:var(--mut)">Создание наборов во фракции (ГОС / Крайм)</div></div></label><button class="btn btn-g" style="width:100%;margin-top:8px" onclick="saveGuideRoles()">✅ Сохранить роли и начать</button>`;document.getElementById('mGuide').classList.add('open')}
+function saveGuideRoles(){cfg.roles.fam=document.getElementById('gChkFam').checked;cfg.roles.frac=document.getElementById('gChkFrac').checked;localStorage.setItem('rh_cfg_v2',JSON.stringify(cfg));finishGuide();msg('Роли сохранены!')}
+function finishGuide(){document.getElementById('mGuide').classList.remove('open');localStorage.setItem('rh_guide_done','1')}
+
+function refreshAll(){rAuth();rFast();rPosts();rMy();rMed();rTop();rPTop();rCal();rTim();rMarket();rBl();rRules();rRp();rPromo();rRev();rAdmReports()}
+setInterval(()=>{let ch=0;tims.forEach(t=>{if(t.run&&t.rem>0){t.rem--;ch=1;if(t.rem===0){t.run=false;beep();msg('⏰ Готово: '+t.name)}}});if(ch){saveAll();rTim()}rFast();rCal();checkEventReminders()},1000);
+updModalServs();updMdServs();updMkServs();applyFavServerFilter();refreshAll();
+if(!localStorage.getItem('rh_guide_done'))startGuide();
+</script>
+</body>
+</html>
