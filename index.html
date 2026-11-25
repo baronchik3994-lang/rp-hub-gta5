@@ -433,12 +433,16 @@ let streamMode = false;
 function toggleStreamMode(){streamMode=!streamMode;document.body.classList.toggle('stream-mode',streamMode);document.getElementById('smBtn').style.borderColor=streamMode?'var(--red)':'var(--brd)';msg(streamMode?'👁 Стример-мод ВКЛ':'👁 Стример-мод ВЫКЛ')}
 function setUStatus(val){userStatus=val;localStorage.setItem('rh_ust',val);msg('Статус: '+val)}
 function rAuth(){
-  const isAdm=user&&user.toLowerCase()===ADMIN_TAG;
-  document.getElementById('admTab').style.display=isAdm?'flex':'none';
-  const dispName=(cfg.gameNick&&user)?`${esc(cfg.gameNick)} <span style="font-size:11px;color:var(--mut);font-weight:400">(${esc(user)})</span>`:esc(user);
-  document.getElementById('authArea').innerHTML=user?`<div style="display:flex;gap:8px;align-items:center;background:var(--bg);padding:4px 8px;border-radius:8px;border:1px solid var(--brd);flex-wrap:wrap"><select onchange="setUStatus(this.value)" style="padding:3px 6px;font-size:11px;border:none;background:transparent;color:var(--txt);cursor:pointer"><option value="🟢 Готов играть" ${userStatus==='🟢 Готов играть'?'selected':''}>🟢 Готов играть</option><option value="⚔ На капте / ВЗХ" ${userStatus==='⚔ На капте / ВЗХ'?'selected':''}>⚔ На капте / ВЗХ</option><option value="🟡 АФК / Фарм" ${userStatus==='🟡 АФК / Фарм'?'selected':''}>🟡 АФК / Фарм</option></select><b style="font-size:13px">${dispName}</b>${isAdm?'<span class="bdg b-maj">ADMIN</span>':''}<button class="btn btn-o btn-sm" onclick="logout()">Выйти</button></div>`:`<button class="btn btn-p btn-sm" onclick="loginWithDiscord()">Войти через Discord</button>`;
-  if(user&&document.getElementById('rNick'))document.getElementById('rNick').value=cfg.gameNick||user;
+  const isAdm = user && user.toLowerCase() === ADMIN_TAG;
+  document.getElementById('admTab').style.display = isAdm ? 'flex' : 'none';
+  const dispName = (cfg.gameNick && user) ? `${esc(cfg.gameNick)} <span style="font-size:11px;color:var(--mut);font-weight:400">(${esc(user)})</span>` : esc(user);
+  const avHtml = userAvatar ? `<img src="${esc(userAvatar)}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid var(--acc)">` : '';
+  document.getElementById('authArea').innerHTML = user
+    ? `<div style="display:flex;gap:6px;align-items:center;background:var(--bg);padding:4px 8px;border-radius:8px;border:1px solid var(--brd);flex-wrap:wrap"><select onchange="setUStatus(this.value)" style="padding:3px 6px;font-size:11px;border:none;background:var(--card)"><option ${userStatus==='🟢 Готов играть'?'selected':''}>🟢 Готов играть</option><option ${userStatus==='⚔️ На капте / ВЗХ'?'selected':''}>⚔️ На капте / ВЗХ</option><option ${userStatus==='🟡 АФК / Фарм'?'selected':''}>🟡 АФК / Фарм</option></select>${avHtml}<b style="font-size:13px">${dispName}</b>${isAdm?'<span class="bdg b-maj">ADMIN</span>':''}<button class="btn btn-o btn-sm" onclick="logout()">Выйти</button></div>`
+    : `<button class="btn btn-p btn-sm" onclick="loginWithDiscord()">Войти через Discord</button>`;
+  if(user && document.getElementById('rNick')) document.getElementById('rNick').value = cfg.gameNick || user;
 }
+
 
 function login(){const d=document.getElementById('inDisc').value.trim(),p=document.getElementById('inPass').value.trim();if(!d||!p)return msg('Введите Discord и пароль!',1);const key=d.toLowerCase();if(usersDB[key]){if(usersDB[key].pass!==p)return msg('❌ Неверный пароль!',1);if(usersDB[key].wh2fa){if(!pending2FA){pending2FA=String(Math.floor(100000+Math.random()*900000));fetch(usersDB[key].wh2fa,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:`🔐 **Код 2FA:** \`${pending2FA}\``})}).catch(()=>{});document.getElementById('auth2faBox').style.display='block';return msg('🔐 Код 2FA отправлен в Discord!');}else if(document.getElementById('in2faCode').value.trim()!==pending2FA)return msg('❌ Неверный код 2FA!',1)}}else{usersDB[key]={pass:p,wh2fa:""};localStorage.setItem('rh_users_db',JSON.stringify(usersDB))}pending2FA=null;document.getElementById('auth2faBox').style.display='none';user=d;localStorage.setItem('rh_u',JSON.stringify(user));cl('mAuth');refreshAll();msg('Добро пожаловать, '+d+'!')}
 function logout(){user=null;localStorage.removeItem('rh_u');privUnlocked=false;crmUnlocked=false;refreshAll();msg('Вы вышли из аккаунта')}
@@ -500,7 +504,9 @@ function rPriv(){
   document.getElementById('psName').value=ps.name;document.getElementById('psAge').value=ps.age;document.getElementById('psSpec').value=ps.spec||'🎮 Новичок';document.getElementById('psClip').value=ps.clip;document.getElementById('psYt').value=ps.yt;document.getElementById('psTw').value=ps.tw;document.getElementById('psSt').value=ps.st;document.getElementById('psBio').value=ps.bio;
   let achs=[];if(isAdm)achs.push('👑 Создатель RP-HUB');if(ps.clip)achs.push('🎯 Снайпер');if(privState.bal>=1000000)achs.push('💰 Миллионер');if(crmState.created)achs.push('🛡 Глава династии');if(ps.yt||ps.tw)achs.push('🎥 Контент-мейкер');
   let soc='';if(ps.yt)soc+=`<a href="${esc(ps.yt)}" target="_blank" class="btn btn-sm" style="background:#FF0000">🔴 YouTube</a> `;if(ps.tw)soc+=`<a href="${esc(ps.tw)}" target="_blank" class="btn btn-sm" style="background:#9146FF">🟣 Twitch</a> `;if(ps.st)soc+=`<a href="${esc(ps.st)}" target="_blank" class="btn btn-sm" style="background:#171a21;border:1px solid var(--brd)">🔵 Steam</a> `;if(ps.clip)soc+=`<a href="${esc(ps.clip)}" target="_blank" class="btn btn-p btn-sm">🎬 Мувик</a>`;
-  document.getElementById('passPreview').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px"><span class="bdg b-ver">ПАСПОРТ RP-HUB</span><div>${achs.map(a=>`<span class="bdg b-ach" style="margin-left:4px">${a}</span>`).join('')}</div></div><h3 style="font-size:18px;margin-bottom:4px">${esc(ps.name||'Ник не указан')} <span style="font-size:12px;color:var(--mut)">(${esc(ps.age||'—')} лет)</span></h3><div style="margin-bottom:8px"><span class="bdg b-cat">${esc(ps.spec||'🎮 Новичок')}</span></div><p style="font-size:13px;color:var(--mut);margin-bottom:10px">${esc(ps.bio||'Заполните паспорт слева.')}</p><div style="display:flex;gap:6px;flex-wrap:wrap">${soc}</div>`;
+  const passAv = userAvatar ? `<img src="${esc(userAvatar)}" style="width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid var(--acc);flex-shrink:0">` : '';
+  document.getElementById('passPreview').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:4px"><span class="bdg b-ver">ПАСПОРТ RP-HUB</span><div>${achs.map(a=>`<span class="bdg b-ach" style="margin-left:4px">${a}</span>`).join('')}</div></div><div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">${passAv}<div><h3 style="font-size:18px;margin-bottom:3px">${esc(ps.name||'Ник не указан')} <span style="font-size:12px;color:var(--mut)">(${esc(ps.age||'—')} лет)</span></h3><span class="bdg b-cat">${esc(ps.spec||'🎮 Новичок')}</span></div></div><p style="font-size:13px;color:var(--mut);margin-bottom:10px">${esc(ps.bio||'Заполните паспорт слева.')}</p><div style="display:flex;gap:6px;flex-wrap:wrap">${soc}</div>`;
+
   document.getElementById('pBal').textContent='$'+privState.bal.toLocaleString();
   document.getElementById('goalsListBox').innerHTML=privState.goals.map((g,i)=>{const pct=g.sum>0?Math.min(100,Math.max(0,Math.round((privState.bal/g.sum)*100))):0,left=Math.max(0,g.sum-privState.bal);return `<div style="background:var(--bg);padding:9px;border-radius:8px;border:1px solid var(--brd);margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><b>🎯 ${esc(g.name)} (${pct}%)</b><span>${pct>=100?'🎉 Достигнуто!':'Осталось: $'+left.toLocaleString()} <button class="btn btn-r btn-sm" style="padding:1px 5px;margin-left:4px" onclick="delGoal(${i})">✕</button></span></div><div style="width:100%;height:6px;background:var(--brd);border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${pct>=100?'var(--grn)':'var(--acc)'}"></div></div></div>`}).join('');
   document.getElementById('privLogs').innerHTML=privState.logs.slice(0,10).map(l=>`<div style="padding:4px 0;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between"><span>${esc(l.n)}</span><b style="color:${l.t==='in'?'var(--grn)':'var(--red)'}">${l.t==='in'?'+':'-'}$${l.s.toLocaleString()}</b></div>`).join('');
@@ -625,29 +631,35 @@ const loginWithDiscord = login;
 
 
 logout = async function() {
-  await sb.auth.signOut();
+  if (sb) await sb.auth.signOut();
   user = null;
+  userAvatar = '';
   localStorage.removeItem('rh_u');
+  localStorage.removeItem('rh_u_av');
   privUnlocked = false;
   crmUnlocked = false;
   refreshAll();
   msg('Вы вышли из Discord');
 };
 
+let userAvatar = localStorage.getItem('rh_u_av') || '';
+
 (async function initDiscordSession() {
+  if (!sb) return;
   const { data } = await sb.auth.getSession();
   if (data && data.session && data.session.user) {
     const meta = data.session.user.user_metadata || {};
     const dName = meta.full_name || meta.user_name || meta.name || meta.preferred_username || data.session.user.email;
+    const dAv = meta.avatar_url || meta.picture || '';
     if (dName) {
       const key = dName.toLowerCase();
       if (!usersDB[key]) {
-        const newP = prompt('🔒 Придумайте защитный пароль для вашего профиля на сайте (или нажмите Отмена, чтобы входить только через Discord):');
+        const newP = prompt('🔐 Придумайте защитный пароль для вашего профиля на сайте (или нажмите Отмена, чтобы входить только через Discord):');
         usersDB[key] = { pass: (newP && newP.trim()) ? newP.trim() : 'Discord OAuth', wh2fa: '' };
         localStorage.setItem('rh_users_db', JSON.stringify(usersDB));
       } else if (usersDB[key].pass && usersDB[key].pass !== 'Discord OAuth') {
         if (!sessionStorage.getItem('rh_pass_ok_' + key)) {
-          const checkP = prompt('🔑 Введите ваш защитный пароль для аккаунта ' + dName + ':');
+          const checkP = prompt('🔐 Введите ваш защитный пароль для аккаунта ' + dName + ':');
           if (checkP !== usersDB[key].pass) {
             alert('❌ Неверный защитный пароль! Вход отменён.');
             logout();
@@ -657,11 +669,14 @@ logout = async function() {
         }
       }
       user = dName;
+      userAvatar = dAv;
       localStorage.setItem('rh_u', JSON.stringify(user));
+      localStorage.setItem('rh_u_av', dAv);
       refreshAll();
     }
   }
 })();
+
 
 const CLOUD_MAP = {
   rh_p_v7: { get: () => posts, set: v => posts = v },
