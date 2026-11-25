@@ -603,7 +603,6 @@ const SB_URL = "https://fyjlacratzxlyabhjazn.supabase.co";
 const SB_KEY = "sb_publishable_OA_X6AugkjGccI0sLtwW-A_Kj8agmFm";
 
 const sb = window.supabase.createClient(SB_URL, SB_KEY);
-
 login = async function() {
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'discord',
@@ -611,6 +610,8 @@ login = async function() {
   });
   if (error) msg('Ошибка входа Discord: ' + error.message, 1);
 };
+const loginWithDiscord = login;
+
 
 logout = async function() {
   await sb.auth.signOut();
