@@ -306,7 +306,8 @@ footer a{color:var(--mut);text-decoration:underline;cursor:pointer}footer a:hove
 <div class="toast" id="toast"></div>
 
 <script>
-const ADMIN_TAG = "baron_qer";
+const ADMIN_TAG = "495.49";
+
 const THEMES = [{name:"Discord",color:"#5865F2"},{name:"Majestic",color:"#eb3b5a"},{name:"GTA 5 RP",color:"#fa8231"},{name:"Trace RP",color:"#10b981"},{name:"Arizona V",color:"#ef4444"},{name:"Radmir",color:"#0ea5e9"}];
 const SAFE_DOMAINS = ["imgur.com","://imgur.com","yapx.ru","prnt.sc","ibb.co","postimg.cc","gyazo.com","://discordapp.com","media.discordapp.net","youtube.com","://youtube.com","youtu.be","twitch.tv","www.twitch.tv","clips.twitch.tv","kick.com","rutube.ru","vk.com","vkvideo.ru","://google.com","disk.yandex.ru","streamable.com","t.me","tiktok.com","://tiktok.com"];
 const BAD_WORDS = ["хуй","пизд","бля","еба","сука","мудак","пидор","гандон","шлюх","даун","уеб"];
@@ -350,8 +351,47 @@ function loadBgFile(inp){const f=inp.files;if(!f)return;const r=new FileReader()
 function loadPostImg(inp){const f=inp.files;if(!f)return;const r=new FileReader();r.onload=e=>{tempPostImgData=e.target.result;msg('Баннер семьи прикреплён!')};r.readAsDataURL(f)}
 function resetBg(){cfg.bgCol="#0d0f12";cfg.bgImg="";tempBgData="";document.getElementById('setBgCol').value="#0d0f12";document.getElementById('setBgUrl').value="";localStorage.setItem('rh_cfg_v2',JSON.stringify(cfg));applyCfg();msg('↺ Возвращён стандартный фон!')}
 function maskPassword(p){if(!p)return'Не задан';if(p.length<=2)return p+'*';return p.slice(0,2)+'*'.repeat(Math.max(6,p.length-2))}
-function openSettings(){document.getElementById('setRoleFam').checked=!!cfg.roles.fam;document.getElementById('setRoleFrac').checked=!!cfg.roles.frac;document.getElementById('setProj').value=cfg.favProj||'all';updSetServs();document.getElementById('setServ').value=cfg.favServ||'all';const uObj=user?usersDB[user.toLowerCase()]:null;document.getElementById('setPassMask').value=uObj?maskPassword(uObj.pass):'Войдите в аккаунт';document.getElementById('set2faWh').value=uObj?(uObj.wh2fa||''):'';document.getElementById('setTheme').value=cfg.theme||0;document.getElementById('setBgCol').value=cfg.bgCol||'#0d0f12';document.getElementById('setBgUrl').value=(cfg.bgImg&&!cfg.bgImg.startsWith('data:'))?cfg.bgImg:''}
-function saveSettings(){cfg.roles.fam=document.getElementById('setRoleFam').checked;cfg.roles.frac=document.getElementById('setRoleFrac').checked;cfg.favProj=document.getElementById('setProj').value;cfg.favServ=document.getElementById('setServ').value;cfg.theme=parseInt(document.getElementById('setTheme').value)||0;cfg.bgCol=document.getElementById('setBgCol').value;const uUrl=document.getElementById('setBgUrl').value.trim();if(tempBgData)cfg.bgImg=tempBgData;else if(uUrl)cfg.bgImg=uUrl;localStorage.setItem('rh_cfg_v2',JSON.stringify(cfg));applyCfg();if(user&&usersDB[user.toLowerCase()]){const np=document.getElementById('setNewPass').value.trim();if(np)usersDB[user.toLowerCase()].pass=np;usersDB[user.toLowerCase()].wh2fa=document.getElementById('set2faWh').value.trim();localStorage.setItem('rh_users_db',JSON.stringify(usersDB))}applyFavServerFilter();cl('mSettings');msg('⚙️ Настройки и роли сохранены!')}
+function openSettings(){
+  document.getElementById('setRoleFam').checked=!!cfg.roles.fam;
+  document.getElementById('setRoleFrac').checked=!!cfg.roles.frac;
+  document.getElementById('setProj').value=cfg.favProj||'all';
+  updSetServs();
+  document.getElementById('setServ').value=cfg.favServ||'all';
+  const key=user?user.toLowerCase():null;
+  if(key&&!usersDB[key]){usersDB[key]={pass:'Discord OAuth',wh2fa:''};localStorage.setItem('rh_users_db',JSON.stringify(usersDB));}
+  const uObj=key?usersDB[key]:null;
+  document.getElementById('setPassMask').value=uObj?(uObj.pass==='Discord OAuth'?'Вход через Discord':maskPassword(uObj.pass)):'Войдите в аккаунт';
+  document.getElementById('set2faWh').value=uObj?(uObj.wh2fa||''):'';
+  document.getElementById('setTheme').value=cfg.theme||0;
+  document.getElementById('setBgCol').value=cfg.bgCol||'#0d0f12';
+  document.getElementById('setBgUrl').value=(cfg.bgImg&&!cfg.bgImg.startsWith('data:'))?cfg.bgImg:'';
+}
+
+function saveSettings(){
+  cfg.roles.fam=document.getElementById('setRoleFam').checked;
+  cfg.roles.frac=document.getElementById('setRoleFrac').checked;
+  cfg.favProj=document.getElementById('setProj').value;
+  cfg.favServ=document.getElementById('setServ').value;
+  cfg.theme=Number(document.getElementById('setTheme').value)||0;
+  cfg.bgCol=document.getElementById('setBgCol').value;
+  const uUrl=document.getElementById('setBgUrl').value.trim();
+  if(tempBgData)cfg.bgImg=tempBgData;
+  else if(uUrl)cfg.bgImg=uUrl;
+  localStorage.setItem('rh_cfg_v2',JSON.stringify(cfg));
+  applyCfg();
+  if(user){
+    const key=user.toLowerCase();
+    if(!usersDB[key])usersDB[key]={pass:'Discord OAuth',wh2fa:''};
+    const np=document.getElementById('setNewPass').value.trim();
+    if(np)usersDB[key].pass=np;
+    usersDB[key].wh2fa=document.getElementById('set2faWh').value.trim();
+    localStorage.setItem('rh_users_db',JSON.stringify(usersDB));
+  }
+  applyFavServerFilter();
+  cl('mSettings');
+  msg('⚙ Настройки и роли сохранены!');
+}
+
 function applyFavServerFilter(){if(cfg.favProj&&cfg.favProj!=='all'){document.getElementById('fProj').value=cfg.favProj;updFilterServs();if(cfg.favServ&&cfg.favServ!=='all')document.getElementById('fServ').value=cfg.favServ;rPosts()}}
 let posts = JSON.parse(localStorage.getItem('rh_p_v7')) || [{id:1,proj:"Trace RP",serv:"Trace RP #1",cat:"Набор во фракцию (ГОС / Крайм)",subType:"Гос.",frac:"FIB",tz:"UTC+3",tit:"Открыт набор в академию FIB на Trace RP",desc:"Знание законодательной базы, 18+, микрофон, стабильный онлайн.",disc:"fib_trace",ver:true,yel:"⭐ Топ-актив",closed:false,ts:Date.now(),img:""}];
 let fastList = JSON.parse(localStorage.getItem('rh_fast')) || [{id:1,serv:"Majestic RP | Dallas",task:"Ищу +1 на угон / инкассаторов прямо сейчас",disc:"fast_player",exp:Date.now()+7200000}];
