@@ -423,7 +423,8 @@ let promos = JSON.parse(localStorage.getItem('rh_promos_v2')) || [];
 let revs = JSON.parse(localStorage.getItem('rh_r')) || [{id:1,nick:"baron_qer",star:"⭐⭐⭐⭐⭐",text:"Добро пожаловать в RP-HUB! Оставляйте отзывы и идеи.",mine:false,isBug:false}];
 
 function saveAll(){localStorage.setItem('rh_p_v7',JSON.stringify(posts));localStorage.setItem('rh_fast',JSON.stringify(fastList));localStorage.setItem('rh_apps',JSON.stringify(apps));localStorage.setItem('rh_reps',JSON.stringify(reports));localStorage.setItem('rh_priv_v2',JSON.stringify(privState));localStorage.setItem('rh_crm_v2',JSON.stringify(crmState));localStorage.setItem('rh_f_v2',JSON.stringify(fams));localStorage.setItem('rh_ptop_v2',JSON.stringify(pTop));localStorage.setItem('rh_med_v2',JSON.stringify(medias));localStorage.setItem('rh_ev',JSON.stringify(events));localStorage.setItem('rh_t',JSON.stringify(tims));localStorage.setItem('rh_mkt_v2',JSON.stringify(market));localStorage.setItem('rh_bl_v2',JSON.stringify(bl));localStorage.setItem('rh_binds',JSON.stringify(myBinds));localStorage.setItem('rh_promos_v2',JSON.stringify(promos));localStorage.setItem('rh_r',JSON.stringify(revs))}
-function op(id){if(id==='mSettings')openSettings();if(id==='mPost'){buildPostCatOptions();updModalServs();toggleModalFields();tempPostImgData='';}if(user){if(id==='mPost')document.getElementById('pDisc').value=user;if(id==='mFast')document.getElementById('faDisc').value=user;}document.getElementById(id).classList.add('open')}
+function op(id){if(['mPost','mFast','mApply','mReport','mBug','mBl'].includes(id) && !requireDiscord()) return;
+if(id==='mSettings')openSettings();if(id==='mPost'){buildPostCatOptions();updModalServs();toggleModalFields();tempPostImgData='';}if(user){if(id==='mPost')document.getElementById('pDisc').value=user;if(id==='mFast')document.getElementById('faDisc').value=user;}document.getElementById(id).classList.add('open')}
 function cl(id){document.getElementById(id).classList.remove('open')}
 function sw(id,b){document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('s-'+id).classList.add('active');if(b)b.classList.add('active');if(id==='priv')renderPrivGate();if(id==='crm')renderCrmGate()}
 function cp(d){navigator.clipboard.writeText(d).then(()=>msg('Скопировано: '+d))}
@@ -677,9 +678,18 @@ const CLOUD_MAP = {
   rh_r: { get: () => revs, set: v => revs = v }
 };
 
+function requireDiscord() {
+  if (!user) {
+    msg('🔒 Войдите через Discord, чтобы выполнять это действие!', 1);
+    return false;
+  }
+  return true;
+}
+
 const _origSaveAll = saveAll;
 saveAll = async function() {
   _origSaveAll();
+  if (!sb || !user) return;
   for (const k of Object.keys(CLOUD_MAP)) {
     sb.from('rphub_store').upsert({ key: k, data: CLOUD_MAP[k].get() }).then(() => {});
   }
