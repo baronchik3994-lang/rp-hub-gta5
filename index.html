@@ -347,7 +347,7 @@ let cfg = JSON.parse(localStorage.getItem('rh_cfg_v2')) || {theme:0, bgCol:"#0d0
 if(!cfg.roles) cfg.roles={player:true,fam:false,frac:false};
 let pending2FA = null, tempBgData = "", tempPostImgData = "";
 
-function applyCfg(){document.documentElement.style.setProperty('--acc',THEMES[cfg.theme||0].color);document.documentElement.style.setProperty('--bg',cfg.bgCol||'#0d0f12');document.documentElement.style.setProperty('--bgimg',cfg.bgImg?`url('${cfg.bgImg}')`:'none')};const ct=document.getElementById('crmTab');if(ct)ct.style.display=((user&&user.toLowerCase()===ADMIN_TAG)||(cfg.roles&&(cfg.roles.fam||cfg.roles.frac)))?'flex':'none';}
+function applyCfg(){document.documentElement.style.setProperty('--acc',THEMES[cfg.theme||0].color);document.documentElement.style.setProperty('--bg',cfg.bgCol||'#0d0f12');document.documentElement.style.setProperty('--bgimg',cfg.bgImg?`url('${cfg.bgImg}')`:'none');const ct=document.getElementById('crmTab');if(ct)ct.style.display=((user&&user.toLowerCase()===ADMIN_TAG)||(cfg.roles&&(cfg.roles.fam||cfg.roles.frac)))?'flex':'none';}
 
 applyCfg();
 function loadBgFile(inp){const f=inp.files;if(!f)return;const r=new FileReader();r.onload=e=>{tempBgData=e.target.result;msg('Картинка фона загружена! Нажмите «Сохранить»')};r.readAsDataURL(f)}
