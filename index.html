@@ -68,7 +68,7 @@ footer a{color:var(--mut);text-decoration:underline;cursor:pointer}footer a:hove
     <button class="tab active" onclick="sw('lfg',this)"><span>🔍 Анкеты</span></button>
     <button class="tab" onclick="sw('my',this)"><span>📋 Мои заявки</span><span class="badge-cnt" id="appBadge" style="display:none">0</span></button>
     <button class="tab" onclick="sw('priv',this)"><span>👤 Личный кабинет</span></button>
-    <button class="tab" onclick="sw('crm',this)"><span>🛡 Кабинет Лидера</span></button>
+    <button class="tab" id="crmTab" onclick="sw('crm',this)"><span>🛡 Кабинет Лидера</span></button>
     <button class="tab" onclick="sw('med',this)"><span>🎥 Стримеры / Медиа</span></button>
     <button class="tab" onclick="sw('top',this)"><span>🏆 Топ семей</span></button>
     <button class="tab" onclick="sw('ptop',this)"><span>🏅 Топ игроков</span></button>
@@ -347,7 +347,8 @@ let cfg = JSON.parse(localStorage.getItem('rh_cfg_v2')) || {theme:0, bgCol:"#0d0
 if(!cfg.roles) cfg.roles={player:true,fam:false,frac:false};
 let pending2FA = null, tempBgData = "", tempPostImgData = "";
 
-function applyCfg(){document.documentElement.style.setProperty('--acc',THEMES[cfg.theme||0].color);document.documentElement.style.setProperty('--bg',cfg.bgCol||'#0d0f12');document.documentElement.style.setProperty('--bgimg',cfg.bgImg?`url('${cfg.bgImg}')`:'none')}
+function applyCfg(){document.documentElement.style.setProperty('--acc',THEMES[cfg.theme||0].color);document.documentElement.style.setProperty('--bg',cfg.bgCol||'#0d0f12');document.documentElement.style.setProperty('--bgimg',cfg.bgImg?`url('${cfg.bgImg}')`:'none')};const ct=document.getElementById('crmTab');if(ct)ct.style.display=((user&&user.toLowerCase()===ADMIN_TAG)||(cfg.roles&&(cfg.roles.fam||cfg.roles.frac)))?'flex':'none';}
+
 applyCfg();
 function loadBgFile(inp){const f=inp.files;if(!f)return;const r=new FileReader();r.onload=e=>{tempBgData=e.target.result;msg('Картинка фона загружена! Нажмите «Сохранить»')};r.readAsDataURL(f)}
 function loadPostImg(inp){const f=inp.files;if(!f)return;const r=new FileReader();r.onload=e=>{tempPostImgData=e.target.result;msg('Баннер семьи прикреплён!')};r.readAsDataURL(f)}
@@ -535,10 +536,19 @@ function delFam(id){fams=fams.filter(x=>x.id!==id);saveAll();rTop()}
 function rTop(){const isAdm=user&&user.toLowerCase()===ADMIN_TAG,s=[...fams].sort((a,b)=>b.sc-a.sc);document.getElementById('topBox').innerHTML=s.length?s.map((f,i)=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:12px"><div style="width:30px;height:30px;border-radius:8px;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-weight:800">#${i+1}</div><div><b>${esc(f.name)}</b><div style="font-size:12px;color:var(--mut)">${esc(f.serv)} • <span class="bdg b-st">${esc(f.st)}</span></div></div></div><div style="display:flex;align-items:center;gap:8px"><button class="btn btn-o btn-sm" onclick="likeFam(${f.id})">👍 ${f.likes||0}</button><b style="color:var(--yel)">${f.sc} pts</b><button class="btn btn-p btn-sm" onclick="cp('${esc(f.disc)}')">Вступить</button>${isAdm?`<button class="btn btn-r btn-sm" onclick="delFam(${f.id})">🗑</button>`:''}</div></div>`).join(''):`<div class="card" style="text-align:center;color:var(--mut)">Семьи добавляются автоматически при создании Кабинета Лидера.</div>`}
 function addPlayerPts(nick,pts){if(!nick||nick.toLowerCase()==='xatashi nomadied')return;let pl=pTop.find(x=>x.nick.toLowerCase()===nick.toLowerCase());if(pl)pl.pts+=pts;else pTop.push({id:Date.now(),nick,proj:cfg.favProj!=='all'?cfg.favProj:'GTA 5 RP',pts,rep:1,voted:{}})}
 function voteRep(id,delta){const v=(user||'guest').toLowerCase(),pl=pTop.find(x=>x.id===id);if(!pl)return;if(!pl.voted)pl.voted={};if(pl.voted[v]===delta)return msg('Вы уже оценили!',1);pl.rep=(pl.rep||0)+delta;pl.voted[v]=delta;saveAll();rPTop();msg(delta>0?'⭐ +реп!':'⚠️ -реп!')}
+function delPTop(id){
+  if(!user||user.toLowerCase()!==ADMIN_TAG)return;
+  if(!confirm('Удалить игрока из рейтинга?'))return;
+  pTop=pTop.filter(x=>x.id!==id);
+  saveAll();
+  rPTop();
+  msg('🗑 Игрок удалён из рейтинга');
+}
 function rPTop(){
+  const isAdm=user&&user.toLowerCase()===ADMIN_TAG;
   const s=[...pTop].filter(x=>x.nick.toLowerCase()!=='xatashi nomadied').sort((a,b)=>b.pts-a.pts);
-  const zero=`<div class="card" style="border-color:var(--yel);background:linear-gradient(90deg,rgba(240,178,50,.12),rgba(22,25,32,.95));display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:12px"><div style="width:32px;height:32px;border-radius:8px;background:var(--yel);color:#000;display:flex;align-items:center;justify-content:center;font-weight:900">#0</div><div><b style="font-size:16px">Xatashi Nomadied</b> <span class="bdg b-ach">👑 Легенда / Почётное место</span><div style="font-size:12px;color:var(--mut)">Все проекты RP-HUB • Особый статус</div></div></div><b style="color:var(--yel)">∞ pts</b></div>`;
-  document.getElementById('pTopBox').innerHTML=zero+s.map((p,i)=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:12px"><div style="width:30px;height:30px;border-radius:8px;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-weight:800">#${i+1}</div><div><b>${esc(p.nick)}</b> <span class="bdg b-ach">${p.pts>=500?'Легенда':(p.pts>=200?'Авторитет':(p.pts>=80?'Местный':'Новичок'))}</span><div style="font-size:12px;color:var(--mut)">${esc(p.proj)} • Карма: <b style="color:${p.rep>=0?'var(--grn)':'var(--red)'}">${p.rep>=0?'+':''}${p.rep} реп</b></div></div></div><div style="display:flex;align-items:center;gap:6px"><button class="btn btn-g btn-sm" onclick="voteRep(${p.id},1)">+реп</button><button class="btn btn-r btn-sm" onclick="voteRep(${p.id},-1)">-реп</button><b style="color:var(--acc);margin-left:6px">${p.pts} pts</b></div></div>`).join('');
+  const zero=`<div class="card" style="border-color:var(--yel);background:linear-gradient(90deg,rgba(240,178,50,.12),rgba(22,25,32,.95));display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:12px"><div style="width:32px;height:32px;border-radius:8px;background:var(--yel);color:#000;display:flex;align-items:center;justify-content:center;font-weight:900">👑</div><div><b style="font-size:16px">Xatashi Nomadied</b> <span class="bdg b-ach">🏆 Легенда / Почётное место</span><div style="font-size:12px;color:var(--mut)">Все проекты RP-HUB • Особый статус</div></div></div><div style="color:var(--yel)">∞ pts</div></div>`;
+  document.getElementById('pTopBox').innerHTML=zero+s.map((p,i)=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:12px"><div style="width:30px;height:30px;border-radius:8px;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-weight:800">#${i+1}</div><div><b>${esc(p.nick)}</b> <span class="bdg b-ach">${p.pts>=500?'Легенда':(p.pts>=200?'Авторитет':(p.pts>=80?'Местный':'Новичок'))}</span><div style="font-size:12px;color:var(--mut)">${esc(p.proj)} • Карма: <b style="color:${(p.rep||0)>=0?'var(--grn)':'var(--red)'}">${(p.rep||0)>0?'+':''}${p.rep||0}</b></div></div></div><div style="display:flex;align-items:center;gap:6px"><button class="btn btn-g btn-sm" onclick="voteRep(${p.id},1)">▲</button><button class="btn btn-b btn-sm" onclick="voteRep(${p.id},-1)">▼</button><b style="color:var(--acc);margin-left:6px">${p.pts} pts</b>${isAdm?`<button class="btn btn-d btn-sm" onclick="delPTop(${p.id})">🗑</button>`:''}</div></div>`).join('');
 }
 
 function rMed(){const s=[...medias].sort((a,b)=>(b.status==='live')-(a.status==='live'));document.getElementById('medBox').innerHTML=s.map(m=>`<div class="card" style="${m.status==='live'?'border-color:var(--red)':''}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b>${m.status==='live'?'<span class="live-dot"></span>LIVE • ':''}${esc(m.name)}</b><span class="bdg b-oth">🎥 MEDIA</span></div><div style="font-size:12px;color:var(--mut);margin-bottom:10px"><span class="bdg b-cat">${esc(m.proj)}</span> ${m.promo?`• Промокод: <b style="color:var(--yel)">${esc(m.promo)}</b>`:''}</div><div style="display:flex;gap:6px"><a href="${esc(m.link)}" target="_blank" class="btn btn-p btn-sm" style="flex:1">Смотреть стрим</a>${m.promo?`<button class="btn btn-o btn-sm" onclick="cp('${esc(m.promo)}')">Промо</button>`:''}</div></div>`).join('')}
@@ -629,6 +639,22 @@ logout = async function() {
     const meta = data.session.user.user_metadata || {};
     const dName = meta.full_name || meta.user_name || meta.name || meta.preferred_username || data.session.user.email;
     if (dName) {
+      const key = dName.toLowerCase();
+      if (!usersDB[key]) {
+        const newP = prompt('🔒 Придумайте защитный пароль для вашего профиля на сайте (или нажмите Отмена, чтобы входить только через Discord):');
+        usersDB[key] = { pass: (newP && newP.trim()) ? newP.trim() : 'Discord OAuth', wh2fa: '' };
+        localStorage.setItem('rh_users_db', JSON.stringify(usersDB));
+      } else if (usersDB[key].pass && usersDB[key].pass !== 'Discord OAuth') {
+        if (!sessionStorage.getItem('rh_pass_ok_' + key)) {
+          const checkP = prompt('🔑 Введите ваш защитный пароль для аккаунта ' + dName + ':');
+          if (checkP !== usersDB[key].pass) {
+            alert('❌ Неверный защитный пароль! Вход отменён.');
+            logout();
+            return;
+          }
+          sessionStorage.setItem('rh_pass_ok_' + key, '1');
+        }
+      }
       user = dName;
       localStorage.setItem('rh_u', JSON.stringify(user));
       refreshAll();
