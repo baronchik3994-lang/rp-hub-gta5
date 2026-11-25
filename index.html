@@ -642,7 +642,8 @@ logout = async function() {
   msg('Вы вышли из Discord');
 };
 
-let userAvatar = localStorage.getItem('rh_u_av') || '';
+var userAvatar = localStorage.getItem('rh_u_av') || '';
+
 
 (async function initDiscordSession() {
   if (!sb) return;
