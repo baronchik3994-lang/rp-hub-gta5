@@ -429,7 +429,15 @@ let promos = JSON.parse(localStorage.getItem('rh_promos_v2')) || [];
 let revs = JSON.parse(localStorage.getItem('rh_r')) || [{id:1,nick:"baron_qer",star:"⭐⭐⭐⭐⭐",text:"Добро пожаловать в RP-HUB! Оставляйте отзывы и идеи.",mine:false,isBug:false}];
 
 function saveAll(){localStorage.setItem('rh_p_v7',JSON.stringify(posts));localStorage.setItem('rh_fast',JSON.stringify(fastList));localStorage.setItem('rh_apps',JSON.stringify(apps));localStorage.setItem('rh_reps',JSON.stringify(reports));localStorage.setItem('rh_priv_v2',JSON.stringify(privState));localStorage.setItem('rh_crm_v2',JSON.stringify(crmState));localStorage.setItem('rh_f_v2',JSON.stringify(fams));localStorage.setItem('rh_ptop_v2',JSON.stringify(pTop));localStorage.setItem('rh_med_v2',JSON.stringify(medias));localStorage.setItem('rh_ev',JSON.stringify(events));localStorage.setItem('rh_t',JSON.stringify(tims));localStorage.setItem('rh_mkt_v2',JSON.stringify(market));localStorage.setItem('rh_bl_v2',JSON.stringify(bl));localStorage.setItem('rh_binds',JSON.stringify(myBinds));localStorage.setItem('rh_promos_v2',JSON.stringify(promos));localStorage.setItem('rh_r',JSON.stringify(revs))}
-function op(id){if(['mPost','mFast','mApply','mReport','mBug','mBl'].includes(id) && !requireDiscord()) return;
+function op(id){
+  const isAdm = user && user.toLowerCase() === ADMIN_TAG;
+  if ((id === 'mStream' || id === 'mPromo') && !isMediaPartner && !isAdm) {
+    if (confirm('🔒 Размещение стримов и промокодов доступно только партнёрам с ролью @media в нашем Discord!\n\nПерейти в Discord-сервер RP-HUB для получения роли?')) {
+      window.open('https://discord.gg' + '/d8CsTRVUs', '_blank');
+    }
+    return;
+  }
+if(['mPost','mFast','mApply','mReport','mBug','mBl'].includes(id) && !requireDiscord()) return;
 if(id==='mSettings')openSettings();if(id==='mPost'){buildPostCatOptions();updModalServs();toggleModalFields();tempPostImgData='';}if(user){if(id==='mPost')document.getElementById('pDisc').value=user;if(id==='mFast')document.getElementById('faDisc').value=user;}document.getElementById(id).classList.add('open')}
 function cl(id){document.getElementById(id).classList.remove('open')}
 function sw(id,b){document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('s-'+id).classList.add('active');if(b)b.classList.add('active');if(id==='priv')renderPrivGate();if(id==='crm')renderCrmGate()}
@@ -626,30 +634,55 @@ const SB_URL = "https://fyjlacratzxlyabhjazn.supabase.co";
 const SB_KEY = "sb_publishable_OA_X6AugkjGccI0sLtwW-A_Kj8agmFm";
 
 const sb = window.supabase.createClient(SB_URL, SB_KEY);
+var userAvatar = localStorage.getItem('rh_u_av') || '';
+var isMediaPartner = localStorage.getItem('rh_is_media') === '1';
+const GUILD_ID = '1575024546048909345';
+const MEDIA_ROLE_ID = '1575824145655140402';
+
+async function checkDiscordMediaRole(providerToken) {
+  if (!providerToken) return;
+  try {
+        const res = await fetch('https://discord.com' + '/api/v10/users/@me/guilds/1575024546048909345/member', {
+
+
+      headers: { Authorization: `Bearer ${providerToken}` }
+    });
+    if (res.ok) {
+      const member = await res.json();
+      isMediaPartner = Array.isArray(member.roles) && member.roles.includes(MEDIA_ROLE_ID);
+    } else {
+      isMediaPartner = false;
+    }
+    localStorage.setItem('rh_is_media', isMediaPartner ? '1' : '0');
+  } catch (e) {}
+}
+
 login = async function() {
+  if (!sb) return alert('Supabase не подключен');
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'discord',
-    options: { redirectTo: window.location.origin + window.location.pathname }
+    options: {
+      redirectTo: window.location.origin + window.location.pathname,
+      scopes: 'identify email guilds.members.read'
+    }
   });
   if (error) msg('Ошибка входа Discord: ' + error.message, 1);
 };
 const loginWithDiscord = login;
 
-
 logout = async function() {
   if (sb) await sb.auth.signOut();
   user = null;
   userAvatar = '';
+  isMediaPartner = false;
   localStorage.removeItem('rh_u');
   localStorage.removeItem('rh_u_av');
+  localStorage.removeItem('rh_is_media');
   privUnlocked = false;
   crmUnlocked = false;
   refreshAll();
   msg('Вы вышли из Discord');
 };
-
-var userAvatar = localStorage.getItem('rh_u_av') || '';
-
 
 (async function initDiscordSession() {
   if (!sb) return;
@@ -679,6 +712,7 @@ var userAvatar = localStorage.getItem('rh_u_av') || '';
       userAvatar = dAv;
       localStorage.setItem('rh_u', JSON.stringify(user));
       localStorage.setItem('rh_u_av', dAv);
+      if (data.session.provider_token) await checkDiscordMediaRole(data.session.provider_token);
       refreshAll();
     }
   }
